@@ -1,6 +1,6 @@
 # WinOS Development Context
 
-Last updated: 2026-11-14
+Last updated: 2026-11-15
 
 This file is the handoff for continuing WinOS development across chats. Keep it concise and update it whenever a meaningful implementation milestone or architectural decision changes.
 
@@ -71,6 +71,37 @@ The Clang analyzer currently:
 - Extracts supported declarations, parameters, types, source positions, and explicit Clang comment documentation.
 - Merges some redeclarations and distinguishes overloads using signature/mangled-name information.
 - Has not yet been fully validated against a representative C++ test suite or a successful local build. Treat edge cases (header/macro source attribution, templates, source ranges, definition detection, return-type parsing) as needing validation.
+
+## Latest WinOS-Editor workspace update (2026-11-15)
+
+Remote repository was updated directly by the assistant. The user must pull these commits before local testing. Changes have NOT been built or runtime-tested in this environment.
+
+Commits:
+- `f80c6cca644df0f5651cc422a7871a7d082c4372` — editor workspace interactions and event wiring.
+- `7b02ee5caf85795f28bb98a61c853b291d418cf8` — status bar and window keyboard/closing events.
+
+Changes in `Editor/MainWindow.xaml.cs`:
+- Rebuilt `CreateEditorTab` so editor handlers are registered once, not inside `TextChanged`. The previous nesting caused handlers to accumulate on every keystroke.
+- Preserved auto bracket/quote pairing, selection wrapping, closing-character skip, paired Backspace, and smart Enter.
+- Added Tab indentation and Shift+Tab outdent.
+- Added per-tab close buttons and shared close confirmation.
+- Added Ctrl+S, Ctrl+Shift+S, Ctrl+W, Ctrl+Tab and Ctrl+Shift+Tab.
+- Added caret line/column status updates.
+- Added window-close confirmation for modified documents and project save.
+- Fixed startup ordering so LLVM/analyzer initialization occurs before opening a project and starting analysis.
+- Updated save/close tab title handling.
+- Clears both hierarchies and symbol cache when switching projects.
+
+Changes in `Editor/MainWindow.xaml`:
+- Added global keyboard and window-closing event handlers.
+- Added a bottom status bar showing project name and caret position.
+- Reserved space for the status bar without changing the main workspace layout.
+
+Important next action:
+- User must pull the latest remote commits and build/test locally. Do not claim these changes compile until user verifies.
+- Check close-button appearance, Ctrl+Tab navigation, Ctrl+S/Shift+Ctrl+S, window close prompts, smart indentation, Tab/Shift+Tab, and project switching.
+- Known limitation: editor remains a WPF TextBox, not a syntax-highlighting editor. Auto-pairing is not syntax-aware and indentation is basic.
+- Next workspace priorities after verification: find/replace, Go To Line, editor zoom/font controls, line numbers, syntax highlighting, and proper diagnostics/build output integration.
 
 ## Current UI / integration status
 
