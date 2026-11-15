@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WinOS_Editor"
         mc:Ignorable="d"
-        Title="WinOS Framework Studio (WinOS-Editor)" Height="720" Width="1280" Background="{DynamicResource {x:Static SystemColors.AccentColorBrushKey}}" WindowState="Maximized">
+        Title="WinOS Framework Studio (WinOS-Editor)" Height="720" Width="1280" Background="{DynamicResource {x:Static SystemColors.AccentColorBrushKey}}" WindowState="Maximized" PreviewKeyDown="MainWindowPreviewKeyDown" Closing="MainWindowClosing">
     <Grid>
         <Menu VerticalAlignment="Top" Height="18">
             <MenuItem Header="_File">
@@ -24,7 +24,7 @@
                 <MenuItem Header="_Build"/>
             </MenuItem>
         </Menu>
-        <Grid Margin="0,18,0,0">
+        <Grid Margin="0,18,0,22">
             <Grid.RowDefinitions>
                 <RowDefinition Height="1.5*"/>
                 <RowDefinition Height="0.5*"/>
@@ -115,4 +115,15 @@
             <GridSplitter HorizontalAlignment="Stretch" Grid.Row="1" Background="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" VerticalAlignment="Top" Height="5" Margin="0,-2.5,0,0"/>
         </Grid>
     </Grid>
+    <StatusBar VerticalAlignment="Bottom" Height="22"
+               Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}"
+               Foreground="{DynamicResource {x:Static SystemColors.AccentColorLight3BrushKey}}">
+        <StatusBarItem>
+            <TextBlock x:Name="WorkspaceStatusText" Text="No project"/>
+        </StatusBarItem>
+        <Separator/>
+        <StatusBarItem HorizontalAlignment="Right">
+            <TextBlock x:Name="CaretStatusText"/>
+        </StatusBarItem>
+    </StatusBar>
 </Window>
