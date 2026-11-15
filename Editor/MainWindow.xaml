@@ -12,123 +12,124 @@
             <RowDefinition Height="22"/>
         </Grid.RowDefinitions>
         <Grid Margin="0,0,0,0">
-        <Menu VerticalAlignment="Top" Height="18">
-            <MenuItem Header="_File">
-                <MenuItem Header="_New" Click="NewProject"/>
-                <MenuItem Header="_Open" Click="OpenProject"/>
-                <MenuItem Header="_Save" Click="SaveProject"/>
-                <MenuItem Header="_Exit" Click="Exit"/>
-                <MenuItem Header="Save + Ex_it" Click="SaveplusExit"/>
-            </MenuItem>
-            <MenuItem Header="_Edit">
-                <MenuItem Header="Fra_mework metadata..." Click="ShowFrameworkMetadata"/>
-            </MenuItem>
-            <MenuItem Header="_View"/>
-            <MenuItem Header="_Build">
-                <MenuItem Header="_Check for Errors"/>
-                <MenuItem Header="_Build"/>
-            </MenuItem>
-        </Menu>
-        <Grid Margin="0,18,0,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="1.5*"/>
-                <RowDefinition Height="0.5*"/>
-            </Grid.RowDefinitions>
-            <Grid Margin="0,0,0,2.5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1.7*"/>
-                    <ColumnDefinition Width="0.3*"/>
-                </Grid.ColumnDefinitions>
-                <Grid>
-                    <TabControl x:Name="EditorTabs" Background="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorBrushKey}}" Margin="0,0,2,0" SelectionChanged="EditorTabsSelectionChanged">
-                    </TabControl>
-                    <Menu Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top" Background="{DynamicResource {x:Static SystemColors.AccentColorBrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}">
-                        <MenuItem Header="⋮" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Height="20" Width="20">
-                            <MenuItem Header="Save" Click="SaveActiveDocumentToolbarClick"/>
-                            <MenuItem Header="Save All" Click="SaveAllDocumentsToolbarClick"/>
-                            <Separator/>
-                            <MenuItem Header="Close Tab" Click="CloseActiveTabToolbarClick"/>
-                            <MenuItem Header="Close All Tabs" Click="CloseAllTabsToolbarClick"/>
-                        </MenuItem>
-                    </Menu>
-                </Grid>
-                <Grid Grid.Column="1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Grid Grid.IsSharedSizeScope="True" Margin="2.5,0,0,2.5">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="24"/>
-                            <RowDefinition/>
-                            <RowDefinition Height="20"/>
-                        </Grid.RowDefinitions>
-                        <TextBlock TextWrapping="Wrap" TextDecorations="Underline" FontWeight="Bold" Margin="0,4,0,0"><Run Text="&#x9;" TextDecorations="Underline"/><Run Text="FW Hierarchy"/></TextBlock>
-                        <TreeView x:Name="FWTree" Grid.Row="1" BorderBrush="#FF828790" Background="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" MouseDoubleClick="FWTreeDoubleClick" Foreground="{DynamicResource {x:Static SystemColors.AccentColorLight3BrushKey}}"/>
-                        <TextBox x:Name="FWSearch" Grid.Row="2" Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}"/>
-                        <Menu Width="40" Height="20" HorizontalAlignment="Right" VerticalAlignment="Center">
-                            <Menu.Background>
-                                <SolidColorBrush Color="#FFF0F0F0" Opacity="0"/>
-                            </Menu.Background>
-                            <MenuItem Header="X" Width="20" Height="20" FontWeight="Bold"/>
-                            <MenuItem Height="20" Header="⋮" Width="20" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                <MenuItem Header="New..." HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
-                                    <MenuItem Header="Folder"/>
-                                    <MenuItem Header="Source File"/>
-                                </MenuItem>
-                                <MenuItem Header="Add...">
-                                    <MenuItem Header="Folder"/>
-                                    <MenuItem Header="Source File"/>
-                                </MenuItem>
+            <Menu VerticalAlignment="Top" Height="18">
+                <MenuItem Header="_File">
+                    <MenuItem Header="_New" Click="NewProject"/>
+                    <MenuItem Header="_Open" Click="OpenProject"/>
+                    <MenuItem Header="_Save" Click="SaveProject"/>
+                    <MenuItem Header="_Exit" Click="Exit"/>
+                    <MenuItem Header="Save + Ex_it" Click="SaveplusExit"/>
+                </MenuItem>
+                <MenuItem Header="_Edit">
+                    <MenuItem Header="Fra_mework metadata..." Click="ShowFrameworkMetadata"/>
+                </MenuItem>
+                <MenuItem Header="_View"/>
+                <MenuItem Header="_Build">
+                    <MenuItem Header="_Check for Errors"/>
+                    <MenuItem Header="_Build"/>
+                </MenuItem>
+            </Menu>
+            <Grid Margin="0,18,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1.5*"/>
+                    <RowDefinition Height="0.5*"/>
+                </Grid.RowDefinitions>
+                <Grid Margin="0,0,0,2.5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.7*"/>
+                        <ColumnDefinition Width="0.3*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid>
+                        <TabControl x:Name="EditorTabs" Background="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorBrushKey}}" Margin="0,0,2,0" SelectionChanged="EditorTabsSelectionChanged">
+                        </TabControl>
+                        <Menu Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top" Background="{DynamicResource {x:Static SystemColors.AccentColorBrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}">
+                            <MenuItem Header="⋮" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Height="20" Width="20">
+                                <MenuItem Header="Save" Click="SaveActiveDocumentToolbarClick"/>
+                                <MenuItem Header="Save All" Click="SaveAllDocumentsToolbarClick"/>
+                                <Separator/>
+                                <MenuItem Header="Close Tab" Click="CloseActiveTabToolbarClick"/>
+                                <MenuItem Header="Close All Tabs" Click="CloseAllTabsToolbarClick"/>
                             </MenuItem>
                         </Menu>
                     </Grid>
-                    <Grid Grid.Row="1" Margin="2.5,2.5,0,0">
+                    <Grid Grid.Column="1">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="24"/>
                             <RowDefinition/>
-                            <RowDefinition Height="20"/>
+                            <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <TextBlock TextWrapping="Wrap" Text="&#x9;Project Hierarchy" FontWeight="Bold" TextDecorations="Underline" Margin="0,4,0,0"/>
-                        <TreeView x:Name="ProjectTree" Grid.Row="1" BorderBrush="#FF828790" Background="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" MouseDoubleClick="ProjectTreeDoubleClick" Foreground="{DynamicResource {x:Static SystemColors.AccentColorLight3BrushKey}}"/>
-                        <TextBox x:Name="ProjectSearch" Grid.Row="2" Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}"/>
-                        <Menu Width="40" Height="20" HorizontalAlignment="Right" VerticalAlignment="Center">
-                            <Menu.Background>
-                                <SolidColorBrush Color="#FFF0F0F0" Opacity="0"/>
-                            </Menu.Background>
-                            <MenuItem Height="20" Header="X" Width="20"/>
-                            <MenuItem Height="20" Header="⋮" Width="20" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                <MenuItem Header="New..." HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
-                                    <MenuItem Header="Folder"/>
-                                    <MenuItem Header="Source File"/>
+                        <Grid Grid.IsSharedSizeScope="True" Margin="2.5,0,0,2.5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="24"/>
+                                <RowDefinition/>
+                                <RowDefinition Height="20"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock TextWrapping="Wrap" TextDecorations="Underline" FontWeight="Bold" Margin="0,4,0,0"><Run Text="&#x9;" TextDecorations="Underline"/><Run Text="FW Hierarchy"/></TextBlock>
+                            <TreeView x:Name="FWTree" Grid.Row="1" BorderBrush="#FF828790" Background="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" MouseDoubleClick="FWTreeDoubleClick" Foreground="{DynamicResource {x:Static SystemColors.AccentColorLight3BrushKey}}"/>
+                            <TextBox x:Name="FWSearch" Grid.Row="2" Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}"/>
+                            <Menu Width="40" Height="20" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <Menu.Background>
+                                    <SolidColorBrush Color="#FFF0F0F0" Opacity="0"/>
+                                </Menu.Background>
+                                <MenuItem Header="X" Width="20" Height="20" FontWeight="Bold"/>
+                                <MenuItem Height="20" Header="⋮" Width="20" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <MenuItem Header="New..." HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                                        <MenuItem Header="Folder"/>
+                                        <MenuItem Header="Source File"/>
+                                    </MenuItem>
+                                    <MenuItem Header="Add...">
+                                        <MenuItem Header="Folder"/>
+                                        <MenuItem Header="Source File"/>
+                                    </MenuItem>
                                 </MenuItem>
-                                <MenuItem Header="Add...">
-                                    <MenuItem Header="Folder"/>
-                                    <MenuItem Header="Source File" Click="AddExistingSource"/>
+                            </Menu>
+                        </Grid>
+                        <Grid Grid.Row="1" Margin="2.5,2.5,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="24"/>
+                                <RowDefinition/>
+                                <RowDefinition Height="20"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock TextWrapping="Wrap" Text="&#x9;Project Hierarchy" FontWeight="Bold" TextDecorations="Underline" Margin="0,4,0,0"/>
+                            <TreeView x:Name="ProjectTree" Grid.Row="1" BorderBrush="#FF828790" Background="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" MouseDoubleClick="ProjectTreeDoubleClick" Foreground="{DynamicResource {x:Static SystemColors.AccentColorLight3BrushKey}}"/>
+                            <TextBox x:Name="ProjectSearch" Grid.Row="2" Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}"/>
+                            <Menu Width="40" Height="20" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <Menu.Background>
+                                    <SolidColorBrush Color="#FFF0F0F0" Opacity="0"/>
+                                </Menu.Background>
+                                <MenuItem Height="20" Header="X" Width="20"/>
+                                <MenuItem Height="20" Header="⋮" Width="20" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <MenuItem Header="New..." HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                                        <MenuItem Header="Folder"/>
+                                        <MenuItem Header="Source File"/>
+                                    </MenuItem>
+                                    <MenuItem Header="Add...">
+                                        <MenuItem Header="Folder"/>
+                                        <MenuItem Header="Source File" Click="AddExistingSource"/>
+                                    </MenuItem>
                                 </MenuItem>
-                            </MenuItem>
-                        </Menu>
+                            </Menu>
+                        </Grid>
+                        <GridSplitter Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Margin="2.5,0,0,-2.5"/>
                     </Grid>
-                    <GridSplitter Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Margin="2.5,0,0,-2.5"/>
+                    <GridSplitter Width="5" Background="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Margin="0,0,-2.5,0"/>
                 </Grid>
-                <GridSplitter Width="5" Background="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Margin="0,0,-2.5,0"/>
+                <TabControl Grid.Row="1" Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}">
+                    <TabItem Header="Warnings and Errors" Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}"/>
+                    <TabItem Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}" Header="Build"/>
+                </TabControl>
+                <GridSplitter HorizontalAlignment="Stretch" Grid.Row="1" Background="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" VerticalAlignment="Top" Height="5" Margin="0,-2.5,0,0"/>
             </Grid>
-            <TabControl Grid.Row="1" Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}">
-                <TabItem Header="Warnings and Errors" Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}"/>
-                <TabItem Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}" Header="Build"/>
-            </TabControl>
-            <GridSplitter HorizontalAlignment="Stretch" Grid.Row="1" Background="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" VerticalAlignment="Top" Height="5" Margin="0,-2.5,0,0"/>
         </Grid>
-        </Grid>
-    <StatusBar Grid.Row="1" VerticalAlignment="Bottom" Height="22"
+        <StatusBar Grid.Row="1" VerticalAlignment="Bottom" Height="22"
                Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}"
                Foreground="{DynamicResource {x:Static SystemColors.AccentColorLight3BrushKey}}">
-        <StatusBarItem>
-            <TextBlock x:Name="WorkspaceStatusText" Text="No project"/>
-        </StatusBarItem>
-        <Separator/>
-        <StatusBarItem HorizontalAlignment="Right">
-            <TextBlock x:Name="CaretStatusText"/>
-        </StatusBarItem>
-    </StatusBar>
+            <StatusBarItem>
+                <TextBlock x:Name="WorkspaceStatusText" Text="No project"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock x:Name="CaretStatusText"/>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
 </Window>

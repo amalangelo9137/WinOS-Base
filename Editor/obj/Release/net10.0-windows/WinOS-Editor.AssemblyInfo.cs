@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WinOS-Editor")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+77f45616939ff6850d2047a9710bbc405ca79aac")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+32069f45b29fbe05c2138a5b12e25fc35106fe7c")]
 [assembly: System.Reflection.AssemblyProductAttribute("WinOS-Editor")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WinOS-Editor")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
