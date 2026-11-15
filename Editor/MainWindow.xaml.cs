@@ -30,13 +30,13 @@ namespace WinOS_Editor
         {
             InitializeComponent();
 
-            if (App.FilePath != string.Empty)
-                OpenProject(App.FilePath);
-
             _toolchainManager.DetectLLVM();
 
             if (_toolchainManager.IsAvailable && _toolchainManager.LLVMPath is string llvmPath)
                 _codeAnalyzer = new ClangCodeAnalyzer(llvmPath);
+
+            if (App.FilePath != string.Empty)
+                OpenProject(App.FilePath);
         }
 
         // Props set;
@@ -90,6 +90,8 @@ namespace WinOS_Editor
             EditorTabs.Items.Clear();
             _documentManager.Clear();
             ProjectTree.Items.Clear();
+            FWTree.Items.Clear();
+            _fileSymbols.Clear();
 
             return true;
         }
@@ -327,13 +329,35 @@ namespace WinOS_Editor
                 NavigateToSymbol(symbol);
         }
 
+        private void UpdateTabHeader(TabItem tab, Document document)
+        {
+            if (tab.Header is DockPanel header &&
+                header.Children.OfType<TextBlock>().FirstOrDefault() is TextBlock title)
+            {
+                title.Text = document.FileName + (document.IsModified ? "*" : "");
+            }
+        }
+
+        private void UpdateEditorStatus()
+        {
+            WorkspaceStatusText.Text = CurrentProject?.Name ?? "No project";
+
+            if (EditorTabs.SelectedItem is not TabItem tab ||
+                tab.Content is not TextBox editor)
+            {
+                CaretStatusText.Text = "";
+                return;
+            }
+
+            int line = editor.GetLineIndexFromCharacterIndex(editor.CaretIndex);
+            int lineStart = editor.GetCharacterIndexFromLineIndex(line);
+            int column = editor.CaretIndex - lineStart;
+
+            CaretStatusText.Text = $"Ln {line + 1}, Col {column + 1}";
+        }
+
         private void CreateEditorTab(Document document)
         {
-            // used to filter out the TextChanged which happens
-            // when the document is initially opened.
-            bool initializing = true;
-
-            // create the editor UI, mainly the textbox
             TextBox editor = new()
             {
                 Name = "Code",
@@ -345,161 +369,272 @@ namespace WinOS_Editor
                 BorderBrush = SystemColors.AccentColorDark2Brush,
                 Cursor = Cursors.IBeam,
                 AcceptsReturn = true,
-                AcceptsTab = true
+                AcceptsTab = false,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Auto
             };
 
-            // create the tab for that file
+            TextBlock title = new()
+            {
+                Text = document.FileName,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(4, 0, 2, 0)
+            };
+
+            Button closeButton = new()
+            {
+                Content = "×",
+                Tag = document,
+                Width = 18,
+                Height = 18,
+                Padding = new Thickness(0),
+                Margin = new Thickness(3, 0, 0, 0),
+                Background = Brushes.Transparent,
+                BorderThickness = new Thickness(0),
+                Cursor = Cursors.Hand,
+                Focusable = false,
+                ToolTip = "Close tab"
+            };
+
+            DockPanel header = new() { LastChildFill = true };
+            DockPanel.SetDock(closeButton, Dock.Right);
+            header.Children.Add(closeButton);
+            header.Children.Add(title);
+
             TabItem tab = new()
             {
-                Header = document.FileName,
+                Header = header,
                 Content = editor,
                 Tag = document
             };
 
-            editor.TextChanged += (sender, e) =>
-            {
-                if (initializing)
-                    return; // here.
+            closeButton.Click += (_, _) => CloseTab(tab);
 
+            editor.TextChanged += (_, _) =>
+            {
                 document.Content = editor.Text;
                 document.IsModified = true;
-
-                tab.Header = document.FileName + "*"; // marker to indicate unsaved
-
-                // Automatically insert matching brackets and quotes.
-                editor.PreviewTextInput += (sender, e) =>
-                {
-                    if (e.Text.Length != 1)
-                        return;
-
-                    char typed = e.Text[0];
-
-                    char closing = typed switch
-                    {
-                        '(' => ')',
-                        '[' => ']',
-                        '{' => '}',
-                        '"' => '"',
-                        '\'' => '\'',
-                        _ => '\0'
-                    };
-
-                    // Handle opening brackets and quotes.
-                    if (closing != '\0')
-                    {
-                        int start = editor.SelectionStart;
-                        string selected = editor.SelectedText;
-
-                        editor.SelectedText = typed + selected + closing;
-
-                        // Keep the caret inside the pair.
-                        editor.CaretIndex = start + 1 + selected.Length;
-
-                        e.Handled = true;
-                        return;
-                    }
-
-                    // Skip an automatically inserted closing character.
-                    if (typed is ')' or ']' or '}' or '"' or '\'')
-                    {
-                        int caret = editor.CaretIndex;
-
-                        if (caret < editor.Text.Length &&
-                            editor.Text[caret] == typed)
-                        {
-                            editor.CaretIndex++;
-                            e.Handled = true;
-                        }
-                    }
-                };
-
-                // Delete both characters when Backspace is pressed
-                // between an automatically inserted pair.
-                editor.PreviewKeyDown += (sender, e) =>
-                {
-                    if (e.Key == Key.Enter)
-                    {
-                        int eCaret = editor.CaretIndex;
-
-                        string textBeforeCaret = editor.Text[..eCaret];
-                        int lineStart = textBeforeCaret.LastIndexOf('\n') + 1;
-
-                        string currentLine = textBeforeCaret[lineStart..];
-
-                        string indentation = new(
-                            currentLine.TakeWhile(c => c is ' ' or '\t').ToArray());
-
-                        bool afterOpeningBrace =
-                            currentLine.TrimEnd().EndsWith('{');
-
-                        bool beforeClosingBrace =
-                            eCaret < editor.Text.Length &&
-                            editor.Text[eCaret] == '}';
-
-                        string unit = "    "; // Four spaces per indentation level.
-
-                        if (afterOpeningBrace && beforeClosingBrace)
-                        {
-                            editor.SelectedText =
-                                Environment.NewLine +
-                                indentation + unit +
-                                Environment.NewLine +
-                                indentation;
-
-                            editor.CaretIndex =
-                                eCaret + Environment.NewLine.Length +
-                                indentation.Length + unit.Length;
-
-                            e.Handled = true;
-                            return;
-                        }
-
-                        string nextIndentation = afterOpeningBrace
-                            ? indentation + unit
-                            : indentation;
-
-                        editor.SelectedText =
-                            Environment.NewLine + nextIndentation;
-
-                        editor.CaretIndex =
-                            eCaret + Environment.NewLine.Length +
-                            nextIndentation.Length;
-
-                        e.Handled = true;
-                        return;
-                    }
-
-                    if (e.Key != Key.Back || editor.SelectionLength != 0) return;
-
-                    int caret = editor.CaretIndex;
-
-                    if (caret <= 0 || caret >= editor.Text.Length)
-                        return;
-
-                    char before = editor.Text[caret - 1];
-                    char after = editor.Text[caret];
-
-                    bool matchingPair =
-                        (before == '(' && after == ')') ||
-                        (before == '[' && after == ']') ||
-                        (before == '{' && after == '}') ||
-                        (before == '"' && after == '"') ||
-                        (before == '\'' && after == '\'');
-
-                    if (matchingPair)
-                    {
-                        editor.Select(caret - 1, 2);
-                        editor.SelectedText = "";
-                        e.Handled = true;
-                    }
-                };
+                UpdateTabHeader(tab, document);
+                UpdateEditorStatus();
             };
 
-            initializing = false;
+            editor.SelectionChanged += (_, _) => UpdateEditorStatus();
 
-            // add  it to the TabControl and activate it
+            // Pair brackets and quotes, wrapping any selected text.
+            editor.PreviewTextInput += (_, e) =>
+            {
+                if (e.Text.Length != 1)
+                    return;
+
+                char typed = e.Text[0];
+                char closing = typed switch
+                {
+                    '(' => ')',
+                    '[' => ']',
+                    '{' => '}',
+                    '"' => '"',
+                    '\'' => '\'',
+                    _ => '\0'
+                };
+
+                if (closing != '\0')
+                {
+                    int selectionStart = editor.SelectionStart;
+                    string selected = editor.SelectedText;
+
+                    editor.SelectedText = typed + selected + closing;
+                    editor.CaretIndex = selectionStart + 1 + selected.Length;
+                    e.Handled = true;
+                    return;
+                }
+
+                // Move over an existing closing character instead of duplicating it.
+                if (typed is ')' or ']' or '}' or '"' or '\'')
+                {
+                    int caret = editor.CaretIndex;
+                    if (caret < editor.Text.Length && editor.Text[caret] == typed)
+                    {
+                        editor.CaretIndex++;
+                        e.Handled = true;
+                    }
+                }
+            };
+
+            editor.PreviewKeyDown += (_, e) =>
+            {
+                if (e.Key == Key.Enter)
+                {
+                    int caret = editor.SelectionStart;
+                    string textBeforeCaret = editor.Text[..caret];
+                    int lineStart = textBeforeCaret.LastIndexOf('\n') + 1;
+                    string currentLine = textBeforeCaret[lineStart..];
+
+                    string indentation = new(
+                        currentLine.TakeWhile(c => c is ' ' or '\t').ToArray());
+
+                    bool afterOpeningBrace = currentLine.TrimEnd().EndsWith('{');
+                    bool beforeClosingBrace =
+                        editor.SelectionLength == 0 &&
+                        caret < editor.Text.Length &&
+                        editor.Text[caret] == '}';
+
+                    const string indentUnit = "    ";
+
+                    if (afterOpeningBrace && beforeClosingBrace)
+                    {
+                        string newline = Environment.NewLine;
+                        editor.SelectedText =
+                            newline + indentation + indentUnit +
+                            newline + indentation;
+
+                        editor.CaretIndex =
+                            caret + newline.Length +
+                            indentation.Length + indentUnit.Length;
+
+                        e.Handled = true;
+                        return;
+                    }
+
+                    string nextIndentation = afterOpeningBrace
+                        ? indentation + indentUnit
+                        : indentation;
+
+                    string lineBreak = Environment.NewLine;
+                    editor.SelectedText = lineBreak + nextIndentation;
+                    editor.CaretIndex = caret + lineBreak.Length + nextIndentation.Length;
+                    e.Handled = true;
+                    return;
+                }
+
+                if (e.Key == Key.Tab)
+                {
+                    if ((Keyboard.Modifiers & ModifierKeys.Shift) != 0)
+                    {
+                        int caret = editor.CaretIndex;
+                        int line = editor.GetLineIndexFromCharacterIndex(caret);
+                        int lineStart = editor.GetCharacterIndexFromLineIndex(line);
+                        int removeCount = 0;
+
+                        while (removeCount < 4 &&
+                               lineStart + removeCount < editor.Text.Length &&
+                               editor.Text[lineStart + removeCount] == ' ')
+                        {
+                            removeCount++;
+                        }
+
+                        if (removeCount == 0 &&
+                            lineStart < editor.Text.Length &&
+                            editor.Text[lineStart] == '\t')
+                        {
+                            removeCount = 1;
+                        }
+
+                        if (removeCount > 0)
+                        {
+                            editor.Select(lineStart, removeCount);
+                            editor.SelectedText = "";
+                            editor.CaretIndex = Math.Max(lineStart, caret - removeCount);
+                        }
+                    }
+                    else
+                    {
+                        editor.SelectedText = "    ";
+                    }
+
+                    e.Handled = true;
+                    return;
+                }
+
+                if (e.Key != Key.Back || editor.SelectionLength != 0)
+                    return;
+
+                int backspaceCaret = editor.CaretIndex;
+                if (backspaceCaret <= 0 || backspaceCaret >= editor.Text.Length)
+                    return;
+
+                char before = editor.Text[backspaceCaret - 1];
+                char after = editor.Text[backspaceCaret];
+
+                bool matchingPair =
+                    (before == '(' && after == ')') ||
+                    (before == '[' && after == ']') ||
+                    (before == '{' && after == '}') ||
+                    (before == '"' && after == '"') ||
+                    (before == '\'' && after == '\'');
+
+                if (matchingPair)
+                {
+                    editor.Select(backspaceCaret - 1, 2);
+                    editor.SelectedText = "";
+                    e.Handled = true;
+                }
+            };
+
             EditorTabs.Items.Add(tab);
             EditorTabs.SelectedItem = tab;
+            editor.Focus();
+            UpdateEditorStatus();
+        }
+
+        private void CloseTab(TabItem tab)
+        {
+            if (tab.Tag is Document document)
+            {
+                if (!ConfirmDocumentClose(document))
+                    return;
+
+                _documentManager.CloseDocument(document);
+            }
+
+            EditorTabs.Items.Remove(tab);
+            UpdateEditorStatus();
+        }
+
+        private void MainWindowPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            bool control = (Keyboard.Modifiers & ModifierKeys.Control) != 0;
+            bool shift = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
+
+            if (!control)
+                return;
+
+            if (e.Key == Key.S)
+            {
+                if (shift)
+                    SaveAllDocumentsToolbarClick(this, new RoutedEventArgs());
+                else
+                    SaveActiveDocument();
+
+                e.Handled = true;
+            }
+            else if (e.Key == Key.W)
+            {
+                CloseActiveTabToolbarClick(this, new RoutedEventArgs());
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Tab && EditorTabs.Items.Count > 1)
+            {
+                int direction = shift ? -1 : 1;
+                int count = EditorTabs.Items.Count;
+                int next = (EditorTabs.SelectedIndex + direction + count) % count;
+                EditorTabs.SelectedIndex = next;
+                e.Handled = true;
+            }
+        }
+
+        private void MainWindowClosing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            foreach (TabItem tab in EditorTabs.Items.Cast<TabItem>().ToList())
+            {
+                if (tab.Tag is Document document && !ConfirmDocumentClose(document))
+                {
+                    e.Cancel = true;
+                    return;
+                }
+            }
+
+            if (CurrentProject != null && !SaveProject())
+                e.Cancel = true;
         }
 
         private void OpenDocumentInEditor(string filePath)
@@ -530,9 +665,7 @@ namespace WinOS_Editor
                 _documentManager.SaveDocument(document);
 
                 if (EditorTabs.SelectedItem is TabItem tab)
-                {
-                    tab.Header = document.FileName;
-                }
+                    UpdateTabHeader(tab, document);
             }
             catch (Exception ex)
             {
@@ -553,6 +686,8 @@ namespace WinOS_Editor
             {
                 _documentManager.SetActiveDocument(document);
             }
+
+            UpdateEditorStatus();
         }
 
         // editor toolbar button click functions
@@ -567,7 +702,7 @@ namespace WinOS_Editor
                 foreach (TabItem tab in EditorTabs.Items)
                 {
                     if (tab.Tag is Document document)
-                        tab.Header = document.FileName;
+                        UpdateTabHeader(tab, document);
                 }
             }
             catch (Exception ex)
@@ -579,35 +714,30 @@ namespace WinOS_Editor
 
         private void CloseActiveTabToolbarClick(object sender, RoutedEventArgs e)
         {
-            if (EditorTabs.SelectedItem is not TabItem tab)
-                return;
-
-            if (tab.Tag is Document document)
-            {
-                if (!ConfirmDocumentClose(document))
-                    return;
-
-                _documentManager.CloseDocument(document);
-            }
-
-            EditorTabs.Items.Remove(tab);
+            if (EditorTabs.SelectedItem is TabItem tab)
+                CloseTab(tab);
         }
 
         private void CloseAllTabsToolbarClick(object sender, RoutedEventArgs e)
         {
-            foreach (TabItem tab in EditorTabs.Items
-                 .Cast<TabItem>().ToList())
+            List<TabItem> tabs = EditorTabs.Items.Cast<TabItem>().ToList();
+
+            // Ask about every modified document before removing any tabs.
+            foreach (TabItem tab in tabs)
+            {
+                if (tab.Tag is Document document && !ConfirmDocumentClose(document))
+                    return;
+            }
+
+            foreach (TabItem tab in tabs)
             {
                 if (tab.Tag is Document document)
-                {
-                    if (!ConfirmDocumentClose(document))
-                        return;
-
                     _documentManager.CloseDocument(document);
-                }
 
                 EditorTabs.Items.Remove(tab);
             }
+
+            UpdateEditorStatus();
         }
 
         private bool ConfirmDocumentClose(Document document)
@@ -630,6 +760,13 @@ namespace WinOS_Editor
                 try
                 {
                     _documentManager.SaveDocument(document);
+
+                    TabItem? documentTab = EditorTabs.Items
+                        .Cast<TabItem>()
+                        .FirstOrDefault(t => t.Tag == document);
+
+                    if (documentTab != null)
+                        UpdateTabHeader(documentTab, document);
                 }
                 catch (Exception ex)
                 {
