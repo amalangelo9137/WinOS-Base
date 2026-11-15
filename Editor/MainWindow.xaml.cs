@@ -383,6 +383,7 @@ namespace WinOS_Editor
             {
                 Name = "Code",
                 Text = document.Content,
+                FontSize = _editorFontSize,
                 TextWrapping = TextWrapping.Wrap,
                 Margin = new(24, 4, 4, 4),
                 Background = SystemColors.DesktopBrush,
@@ -1312,8 +1313,14 @@ namespace WinOS_Editor
                     continue;
                 }
 
-                string objectName = Path.GetFileNameWithoutExtension(relative) + ".obj";
-                string objectPath = Path.Combine(outputDirectory, objectName);
+                string relativeObjectName = Path.ChangeExtension(
+                    Path.GetRelativePath(projectDirectory, source), ".obj");
+                foreach (char invalid in Path.GetInvalidFileNameChars())
+                    relativeObjectName = relativeObjectName.Replace(invalid, '_');
+                relativeObjectName = relativeObjectName
+                    .Replace(Path.DirectorySeparatorChar, '_')
+                    .Replace(Path.AltDirectorySeparatorChar, '_');
+                string objectPath = Path.Combine(outputDirectory, relativeObjectName);
                 ProcessStartInfo start = new()
                 {
                     FileName = Path.Combine(_toolchainManager.LLVMPath!, "clang++.exe"),
