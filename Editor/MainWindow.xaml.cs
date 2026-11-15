@@ -298,7 +298,24 @@ namespace WinOS_Editor
 
         private void SaveplusExit(object sender, RoutedEventArgs e)
         {
-            if (SaveProject() == true) Exit(this, null);
+            try
+            {
+                _documentManager.SaveAllDocuments();
+
+                foreach (TabItem tab in EditorTabs.Items)
+                {
+                    if (tab.Tag is Document document)
+                        UpdateTabHeader(tab, document);
+                }
+
+                if (SaveProject())
+                    Exit(this, null);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Save + Exit Failed",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         // tree double click
