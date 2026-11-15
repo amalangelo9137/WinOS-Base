@@ -21,7 +21,7 @@ WinOS means **WinOS: The OS for Winners**. WinOS-Editor is the WPF-based Framewo
 - **WinOS-Kernel** — C++ kernel and assembly.
 - **WinOS-Editor** — WPF C# framework IDE.
 - **WinOS main** — solution/application-level project.
-- No separate WinOS-Studio project currently exists.
+- A separate **WinOS-Studio** project currently exists under `Studio/`; it is distinct from WinOS-Editor.
 
 When giving implementation instructions, always identify the subproject and exact file path.
 
@@ -86,6 +86,14 @@ Workspace commits:
 - `340bfd940ec99c103b69a847df3aa830842b5124` — ignore future generated bin/obj directories.
 - `60c83a4aed48c629ab9de4e4f31c69ca87efc10e` — update this development handoff.
 
+## Repository-first coding workflow
+
+- Before changing WinOS code, fetch the current complete contents of the target file from GitHub, plus its directly related XAML/code-behind, project file, and any referenced model/toolchain files.
+- Do not patch from remembered snippets or old chat summaries. Re-read the current remote file before each update and use its latest blob SHA.
+- After a change, fetch the committed files again and run static cross-checks: XAML event handlers must exist in code-behind; XAML names must be unique; method declarations must not be accidentally duplicated; nullable/invalid syntax patterns must be checked.
+- Never claim a successful build unless a real build was run. If local Windows/.NET build tools are unavailable, say so and separate verified static checks from unverified compilation.
+- Keep implementation changes narrow. Fix reported compile/runtime errors before adding more features.
+
 ## Current WinOS-Editor workspace status
 
 - The analyzer is connected to both hierarchy panels. Project Hierarchy groups symbols by source file; Framework Hierarchy merges symbols across files.
@@ -98,6 +106,7 @@ Workspace commits:
 - LLVM is user-installed and detected through ToolchainManager; it is not bundled.
 - .gitignore now ignores future bin/ and obj/ output. Previously committed generated artifacts remain tracked until explicitly removed from Git.
 - Recent workspace changes have not been built or runtime-tested in this environment. Treat them as unverified until the user builds locally.
+- 2026-11-15 audit found three invalid null-conditional assignments in `MainWindow.xaml.cs` (`CurrentProject?.Property = ...`) and two XAML search event handlers with no code-behind methods. Commit `c060fc1892dc4526763a9fc056559a302b9f090b` fixes the assignments, implements both missing handlers, and restores hierarchy filtering. Static cross-check now finds no missing MainWindow XAML handlers, no duplicate XAML names, and no invalid null-conditional assignments. A real WPF build is still required.
 
 ## Next workspace priorities
 
