@@ -365,6 +365,134 @@ namespace WinOS_Editor
                 document.IsModified = true;
 
                 tab.Header = document.FileName + "*"; // marker to indicate unsaved
+
+                // Automatically insert matching brackets and quotes.
+                editor.PreviewTextInput += (sender, e) =>
+                {
+                    if (e.Text.Length != 1)
+                        return;
+
+                    char typed = e.Text[0];
+
+                    char closing = typed switch
+                    {
+                        '(' => ')',
+                        '[' => ']',
+                        '{' => '}',
+                        '"' => '"',
+                        '\'' => '\'',
+                        _ => '\0'
+                    };
+
+                    // Handle opening brackets and quotes.
+                    if (closing != '\0')
+                    {
+                        int start = editor.SelectionStart;
+                        string selected = editor.SelectedText;
+
+                        editor.SelectedText = typed + selected + closing;
+
+                        // Keep the caret inside the pair.
+                        editor.CaretIndex = start + 1 + selected.Length;
+
+                        e.Handled = true;
+                        return;
+                    }
+
+                    // Skip an automatically inserted closing character.
+                    if (typed is ')' or ']' or '}' or '"' or '\'')
+                    {
+                        int caret = editor.CaretIndex;
+
+                        if (caret < editor.Text.Length &&
+                            editor.Text[caret] == typed)
+                        {
+                            editor.CaretIndex++;
+                            e.Handled = true;
+                        }
+                    }
+                };
+
+                // Delete both characters when Backspace is pressed
+                // between an automatically inserted pair.
+                editor.PreviewKeyDown += (sender, e) =>
+                {
+                    if (e.Key == Key.Enter)
+                    {
+                        int eCaret = editor.CaretIndex;
+
+                        string textBeforeCaret = editor.Text[..eCaret];
+                        int lineStart = textBeforeCaret.LastIndexOf('\n') + 1;
+
+                        string currentLine = textBeforeCaret[lineStart..];
+
+                        string indentation = new(
+                            currentLine.TakeWhile(c => c is ' ' or '\t').ToArray());
+
+                        bool afterOpeningBrace =
+                            currentLine.TrimEnd().EndsWith('{');
+
+                        bool beforeClosingBrace =
+                            eCaret < editor.Text.Length &&
+                            editor.Text[eCaret] == '}';
+
+                        string unit = "    "; // Four spaces per indentation level.
+
+                        if (afterOpeningBrace && beforeClosingBrace)
+                        {
+                            editor.SelectedText =
+                                Environment.NewLine +
+                                indentation + unit +
+                                Environment.NewLine +
+                                indentation;
+
+                            editor.CaretIndex =
+                                eCaret + Environment.NewLine.Length +
+                                indentation.Length + unit.Length;
+
+                            e.Handled = true;
+                            return;
+                        }
+
+                        string nextIndentation = afterOpeningBrace
+                            ? indentation + unit
+                            : indentation;
+
+                        editor.SelectedText =
+                            Environment.NewLine + nextIndentation;
+
+                        editor.CaretIndex =
+                            eCaret + Environment.NewLine.Length +
+                            nextIndentation.Length;
+
+                        e.Handled = true;
+                        return;
+                    }
+
+                    if (e.Key != Key.Back || editor.SelectionLength != 0) return;
+
+                    int caret = editor.CaretIndex;
+
+                    if (caret <= 0 || caret >= editor.Text.Length)
+                        return;
+
+                    char before = editor.Text[caret - 1];
+                    char after = editor.Text[caret];
+
+                    bool matchingPair =
+                        (before == '(' && after == ')') ||
+                        (before == '[' && after == ']') ||
+                        (before == '{' && after == '}') ||
+                        (before == '"' && after == '"') ||
+                        (before == '\'' && after == '\'');
+
+                    if (matchingPair)
+                    {
+                        editor.Select(caret - 1, 2);
+                        editor.SelectedText = "";
+                        e.Handled = true;
+                    }
+                };
             };
 
             initializing = false;
@@ -570,8 +698,6 @@ namespace WinOS_Editor
         {
             foreach (Symbol symbol in incoming)
             {
-                // Only merge named containers.
-                // Anonymous namespaces must remain separate.
                 bool canMerge =
                     symbol.Name.Length > 0 &&
                     symbol.Kind is
@@ -581,24 +707,124 @@ namespace WinOS_Editor
                         SymbolKind.Union or
                         SymbolKind.Enum;
 
-                if (!canMerge)
+                if (canMerge)
                 {
-                    target.Add(CloneSymbol(symbol));
+                    Symbol? existing = target.FirstOrDefault(s =>
+                        s.Kind == symbol.Kind &&
+                        s.Name == symbol.Name);
+
+                    if (existing == null)
+                    {
+                        target.Add(CloneSymbol(symbol));
+                    }
+                    else
+                    {
+                        MergeSymbolLists(existing.Children, symbol.Children);
+                    }
+
                     continue;
                 }
 
-                Symbol? existing = target.FirstOrDefault(s =>
-                    s.Kind == symbol.Kind &&
-                    s.Name == symbol.Name);
+                if (IsCallable(symbol))
+                {
+                    Symbol? existing = target.FirstOrDefault(s =>
+                        IsCallable(s) &&
+                        SameCallable(s, symbol));
 
-                if (existing == null)
-                {
-                    target.Add(CloneSymbol(symbol));
+                    if (existing == null)
+                    {
+                        target.Add(CloneSymbol(symbol));
+                    }
+                    else
+                    {
+                        MergeCallable(existing, symbol);
+                    }
+
+                    continue;
                 }
-                else
-                {
-                    MergeSymbolLists(existing.Children, symbol.Children);
-                }
+
+                target.Add(CloneSymbol(symbol));
+            }
+        }
+
+        private static bool IsCallable(Symbol symbol)
+        {
+            return symbol.Kind is
+                SymbolKind.Function or
+                SymbolKind.Method or
+                SymbolKind.Constructor or
+                SymbolKind.Destructor;
+        }
+
+        private static bool SameCallable(Symbol a, Symbol b)
+        {
+            if (a.Kind != b.Kind || a.Name != b.Name)
+                return false;
+
+            // Mangled names distinguish overloads and method qualifiers.
+            if (!string.IsNullOrEmpty(a.MangledName) &&
+                !string.IsNullOrEmpty(b.MangledName))
+            {
+                return a.MangledName == b.MangledName;
+            }
+
+            // Use the analyzer's signature when both are available.
+            if (!string.IsNullOrEmpty(a.Signature) &&
+                !string.IsNullOrEmpty(b.Signature))
+            {
+                return a.Signature == b.Signature;
+            }
+
+            // Fallback: compare parameter types.
+            if (a.Parameters.Count != b.Parameters.Count)
+                return false;
+
+            for (int i = 0; i < a.Parameters.Count; i++)
+            {
+                if (a.Parameters[i].Type != b.Parameters[i].Type)
+                    return false;
+            }
+
+            return true;
+        }
+
+        private static void MergeCallable(Symbol existing, Symbol incoming)
+        {
+            // Keep useful documentation from either declaration.
+            if (string.IsNullOrWhiteSpace(existing.Summary))
+                existing.Summary = incoming.Summary;
+
+            if (string.IsNullOrWhiteSpace(existing.ReturnType))
+                existing.ReturnType = incoming.ReturnType;
+
+            if (string.IsNullOrWhiteSpace(existing.Type))
+                existing.Type = incoming.Type;
+
+            // Prefer the definition's location for navigation.
+            if (incoming.IsDefinition && !existing.IsDefinition)
+            {
+                existing.FilePath = incoming.FilePath;
+                existing.Line = incoming.Line;
+                existing.Column = incoming.Column;
+                existing.IsDefinition = true;
+            }
+
+            if (existing.ClangId == null)
+                existing.ClangId = incoming.ClangId;
+
+            if (existing.PreviousDeclId == null)
+                existing.PreviousDeclId = incoming.PreviousDeclId;
+
+            if (existing.MangledName == null)
+                existing.MangledName = incoming.MangledName;
+
+            if (existing.Signature == null)
+                existing.Signature = incoming.Signature;
+
+            foreach (string id in incoming.ClangIds)
+            {
+                if (!existing.ClangIds.Contains(id))
+                    existing.ClangIds.Add(id);
             }
         }
 
