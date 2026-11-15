@@ -21,9 +21,17 @@
                     <MenuItem Header="Save + Ex_it" Click="SaveplusExit"/>
                 </MenuItem>
                 <MenuItem Header="_Edit">
+                    <MenuItem Header="_Find" Click="ShowFindDialog"/>
+                    <MenuItem Header="_Replace" Click="ShowReplaceDialog"/>
+                    <MenuItem Header="_Go To Line..." Click="ShowGoToLineDialog"/>
+                    <Separator/>
                     <MenuItem Header="Fra_mework metadata..." Click="ShowFrameworkMetadata"/>
                 </MenuItem>
-                <MenuItem Header="_View"/>
+                <MenuItem Header="_View">
+                    <MenuItem Header="Zoom _In" Click="ZoomIn"/>
+                    <MenuItem Header="Zoom _Out" Click="ZoomOut"/>
+                    <MenuItem Header="_Reset Zoom" Click="ResetZoom"/>
+                </MenuItem>
                 <MenuItem Header="_Build">
                     <MenuItem Header="_Check for Errors"/>
                     <MenuItem Header="_Build"/>
@@ -65,7 +73,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock TextWrapping="Wrap" TextDecorations="Underline" FontWeight="Bold" Margin="0,4,0,0"><Run Text="&#x9;" TextDecorations="Underline"/><Run Text="FW Hierarchy"/></TextBlock>
                             <TreeView x:Name="FWTree" Grid.Row="1" BorderBrush="#FF828790" Background="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" MouseDoubleClick="FWTreeDoubleClick" Foreground="{DynamicResource {x:Static SystemColors.AccentColorLight3BrushKey}}"/>
-                            <TextBox x:Name="FWSearch" Grid.Row="2" Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}"/>
+                            <TextBox x:Name="FWSearch" Grid.Row="2" TextChanged="FWSearchTextChanged" Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}"/>
                             <Menu Width="40" Height="20" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <Menu.Background>
                                     <SolidColorBrush Color="#FFF0F0F0" Opacity="0"/>
@@ -91,7 +99,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock TextWrapping="Wrap" Text="&#x9;Project Hierarchy" FontWeight="Bold" TextDecorations="Underline" Margin="0,4,0,0"/>
                             <TreeView x:Name="ProjectTree" Grid.Row="1" BorderBrush="#FF828790" Background="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" MouseDoubleClick="ProjectTreeDoubleClick" Foreground="{DynamicResource {x:Static SystemColors.AccentColorLight3BrushKey}}"/>
-                            <TextBox x:Name="ProjectSearch" Grid.Row="2" Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}"/>
+                            <TextBox x:Name="ProjectSearch" Grid.Row="2" TextChanged="ProjectSearchTextChanged" Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}"/>
                             <Menu Width="40" Height="20" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <Menu.Background>
                                     <SolidColorBrush Color="#FFF0F0F0" Opacity="0"/>
@@ -114,8 +122,12 @@
                     <GridSplitter Width="5" Background="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Margin="0,0,-2.5,0"/>
                 </Grid>
                 <TabControl Grid.Row="1" Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}">
-                    <TabItem Header="Warnings and Errors" Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}"/>
-                    <TabItem Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}" Header="Build"/>
+                    <TabItem Header="Warnings and Errors" Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}">
+                        <TextBox x:Name="DiagnosticsOutput" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Background="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorLight3BrushKey}}" BorderThickness="0"/>
+                    </TabItem>
+                    <TabItem Background="{DynamicResource {x:Static SystemColors.AccentColorDark1BrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorDark3BrushKey}}" Header="Build">
+                        <TextBox x:Name="BuildOutput" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Background="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" Foreground="{DynamicResource {x:Static SystemColors.AccentColorLight3BrushKey}}" BorderThickness="0"/>
+                    </TabItem>
                 </TabControl>
                 <GridSplitter HorizontalAlignment="Stretch" Grid.Row="1" Background="{DynamicResource {x:Static SystemColors.AccentColorDark2BrushKey}}" VerticalAlignment="Top" Height="5" Margin="0,-2.5,0,0"/>
             </Grid>
