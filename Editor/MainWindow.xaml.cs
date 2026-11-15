@@ -850,6 +850,7 @@ namespace WinOS_Editor
         {
             TreeViewItem item = new()
             {
+                Foreground = SystemColors.AccentColorLight3Brush,
                 Header = $"{symbol.Kind}: {symbol.Name}",
                 Tag = symbol
             };
@@ -889,6 +890,7 @@ namespace WinOS_Editor
 
                 TreeViewItem fileItem = new()
                 {
+                    Foreground = SystemColors.AccentColorLight3Brush,
                     Header = fileName,
                     Tag = fullPath
                 };
@@ -1105,6 +1107,7 @@ namespace WinOS_Editor
         {
             TreeViewItem item = new()
             {
+                Foreground = SystemColors.AccentColorLight3Brush,
                 Header = $"{symbol.Kind}: {symbol.Name}",
                 Tag = symbol
             };
@@ -1187,7 +1190,6 @@ namespace WinOS_Editor
             }
         }
 
-
         private TextBox? ActiveEditor =>
             EditorTabs.SelectedItem is TabItem tab ? tab.Content as TextBox : null;
 
@@ -1195,10 +1197,12 @@ namespace WinOS_Editor
         {
             Window dialog = new()
             {
-                Title = title, Owner = this,
+                Title = title,
+                Owner = this,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
                 SizeToContent = SizeToContent.WidthAndHeight,
-                ResizeMode = ResizeMode.NoResize, ShowInTaskbar = false
+                ResizeMode = ResizeMode.NoResize,
+                ShowInTaskbar = false
             };
             StackPanel panel = new() { Margin = new Thickness(14), MinWidth = 330 };
             panel.Children.Add(new TextBlock { Text = prompt, Margin = new Thickness(0, 0, 0, 8) });
@@ -1378,8 +1382,10 @@ namespace WinOS_Editor
                 {
                     FileName = Path.Combine(_toolchainManager.LLVMPath!, "clang++.exe"),
                     WorkingDirectory = projectDirectory,
-                    UseShellExecute = false, RedirectStandardOutput = true,
-                    RedirectStandardError = true, CreateNoWindow = true
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
                 };
                 start.ArgumentList.Add("-c");
                 start.ArgumentList.Add(source);

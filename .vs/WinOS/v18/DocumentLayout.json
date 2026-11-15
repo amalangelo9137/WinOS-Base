@@ -61,7 +61,8 @@
               "ToolTip": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Editor\\MainWindow.xaml",
               "RelativeToolTip": "Editor\\MainWindow.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-10-29T08:19:12.755Z"
+              "WhenOpened": "2026-10-29T08:19:12.755Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -69,9 +70,9 @@
               "Title": "MainWindow.xaml.cs",
               "DocumentMoniker": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Editor\\MainWindow.xaml.cs",
               "RelativeDocumentMoniker": "Editor\\MainWindow.xaml.cs",
-              "ToolTip": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Editor\\MainWindow.xaml.cs",
-              "RelativeToolTip": "Editor\\MainWindow.xaml.cs",
-              "ViewState": "AgIAAKkBAAAAzczMzMwkwOcBAAAhAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Editor\\MainWindow.xaml.cs*",
+              "RelativeToolTip": "Editor\\MainWindow.xaml.cs*",
+              "ViewState": "AgIAAHMDAADA//////8nwHwDAABFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-10-29T08:19:11.349Z",
               "EditorCaption": ""
