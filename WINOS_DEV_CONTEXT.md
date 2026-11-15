@@ -74,7 +74,7 @@ The Clang analyzer currently:
 
 ## Latest WinOS-Editor workspace updates (2026-11-15)
 
-The assistant has updated the remote repository directly. Pull the latest main branch before local testing. No local build or runtime test was available here.
+The assistant has updated the remote repository directly. The user has since pulled the fixes, built WinOS-Editor locally, and confirmed that it is working. This is a user-confirmed local build/runtime check; the assistant did not run the build itself.
 
 Workspace commits:
 - `f80c6cca644df0f5651cc422a7871a7d082c4372` — editor workspace interactions and event wiring.
@@ -105,8 +105,8 @@ Workspace commits:
 - Build currently compiles each C/C++ source independently to Build/obj/*.obj. It does not link or package .wdll files yet.
 - LLVM is user-installed and detected through ToolchainManager; it is not bundled.
 - .gitignore now ignores future bin/ and obj/ output. Previously committed generated artifacts remain tracked until explicitly removed from Git.
-- Recent workspace changes have not been built or runtime-tested in this environment. Treat them as unverified until the user builds locally.
-- 2026-11-15 audit found three invalid null-conditional assignments in `MainWindow.xaml.cs` (`CurrentProject?.Property = ...`) and two XAML search event handlers with no code-behind methods. Commit `c060fc1892dc4526763a9fc056559a302b9f090b` fixes the assignments, implements both missing handlers, and restores hierarchy filtering. Static cross-check now finds no missing MainWindow XAML handlers, no duplicate XAML names, and no invalid null-conditional assignments. A real WPF build is still required.
+- The user confirmed on 2026-11-15 that the fixes compile and WinOS-Editor is working locally. Treat the current editor workspace as the stable baseline; do not describe these fixes as build-unverified anymore.
+- 2026-11-15 audit found three invalid null-conditional assignments in `MainWindow.xaml.cs` (`CurrentProject?.Property = ...`) and two XAML search event handlers with no code-behind methods. Commit `c060fc1892dc4526763a9fc056559a302b9f090b` fixes the assignments, implements both missing handlers, and restores hierarchy filtering. Static cross-check found no missing MainWindow XAML handlers, no duplicate XAML names, and no invalid null-conditional assignments. The user subsequently confirmed a successful local build and working editor.
 
 ## Next workspace priorities
 
