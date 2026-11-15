@@ -45,13 +45,22 @@ namespace WinOS_Editor
 
         // Props set;
         public void FrameworkNameSet(string content)
-        { CurrentProject?.Name = content; }
+        {
+            if (CurrentProject != null)
+                CurrentProject.Name = content;
+        }
 
         public void FrameworkVersionSet(string content)
-        { CurrentProject?.Version = content; }
+        {
+            if (CurrentProject != null)
+                CurrentProject.Version = content;
+        }
 
         public void FrameworkDescriptionSet(string content)
-        { CurrentProject?.Description = content; }
+        {
+            if (CurrentProject != null)
+                CurrentProject.Description = content;
+        }
 
         /// <summary>
         /// Shhows the Framework metadata window.
@@ -826,6 +835,39 @@ namespace WinOS_Editor
             return true;
         }
 
+        private void FWSearchTextChanged(object sender, TextChangedEventArgs e)
+        {
+            RefreshFrameworkTree();
+        }
+
+        private void ProjectSearchTextChanged(object sender, TextChangedEventArgs e)
+        {
+            RefreshProjectTree();
+        }
+
+        private static TreeViewItem? CreateFilteredSymbolTreeItem(
+            Symbol symbol, string filter)
+        {
+            TreeViewItem item = new()
+            {
+                Header = $"{symbol.Kind}: {symbol.Name}",
+                Tag = symbol
+            };
+
+            bool selfMatches = string.IsNullOrWhiteSpace(filter) ||
+                symbol.Name.Contains(filter, StringComparison.OrdinalIgnoreCase) ||
+                symbol.Kind.ToString().Contains(filter, StringComparison.OrdinalIgnoreCase);
+
+            foreach (Symbol child in symbol.Children)
+            {
+                TreeViewItem? childItem = CreateFilteredSymbolTreeItem(child, filter);
+                if (childItem != null)
+                    item.Items.Add(childItem);
+            }
+
+            return selfMatches || item.Items.Count > 0 ? item : null;
+        }
+
         private void RefreshProjectTree()
         {
             ProjectTree.Items.Clear();
@@ -835,15 +877,19 @@ namespace WinOS_Editor
                 return;
 
             string projectDirectory = Path.GetDirectoryName(CurrentProjectPath)!;
+            string filter = ProjectSearch.Text.Trim();
 
             foreach (string source in CurrentProject.SourceFiles)
             {
                 string fullPath = Path.GetFullPath(
                     Path.Combine(projectDirectory, source));
+                string fileName = Path.GetFileName(source);
+                bool fileMatches = string.IsNullOrWhiteSpace(filter) ||
+                    fileName.Contains(filter, StringComparison.OrdinalIgnoreCase);
 
                 TreeViewItem fileItem = new()
                 {
-                    Header = Path.GetFileName(source),
+                    Header = fileName,
                     Tag = fullPath
                 };
 
@@ -851,11 +897,17 @@ namespace WinOS_Editor
                 {
                     foreach (Symbol symbol in symbols)
                     {
-                        fileItem.Items.Add(CreateSymbolTreeItem(symbol));
+                        TreeViewItem? symbolItem = fileMatches
+                            ? CreateSymbolTreeItem(symbol)
+                            : CreateFilteredSymbolTreeItem(symbol, filter);
+
+                        if (symbolItem != null)
+                            fileItem.Items.Add(symbolItem);
                     }
                 }
 
-                ProjectTree.Items.Add(fileItem);
+                if (fileMatches || fileItem.Items.Count > 0)
+                    ProjectTree.Items.Add(fileItem);
             }
         }
 
@@ -866,13 +918,14 @@ namespace WinOS_Editor
             List<Symbol> mergedSymbols = [];
 
             foreach (List<Symbol> symbols in _fileSymbols.Values)
-            {
                 MergeSymbolLists(mergedSymbols, symbols);
-            }
 
+            string filter = FWSearch.Text.Trim();
             foreach (Symbol symbol in mergedSymbols)
             {
-                FWTree.Items.Add(CreateSymbolTreeItem(symbol));
+                TreeViewItem? item = CreateFilteredSymbolTreeItem(symbol, filter);
+                if (item != null)
+                    FWTree.Items.Add(item);
             }
         }
 
