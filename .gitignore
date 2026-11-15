@@ -1,2 +1,6 @@
 .vs/*
 WinOS.zip
+
+# Generated build outputs
+**/bin/
+**/obj/
