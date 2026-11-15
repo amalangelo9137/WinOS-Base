@@ -34,7 +34,7 @@ When giving implementation instructions, always identify the subproject and exac
 - Build engine is intended to be custom C#.
 - Avoid adding unnecessary frameworks, toolchains, or configuration layers.
 - Preserve the current editor tab styling unless explicitly asked to change it.
-- User wants to understand and implement straightforward UI work themselves. Explain concepts and guide step by step instead of dumping large code changes.
+- User has asked the assistant to take ownership of implementation-heavy WinOS-Editor workspace changes and provide concise summaries; don't force them through every implementation detail.
 
 ## Code hierarchy requirements
 
@@ -103,34 +103,23 @@ Important next action:
 - Known limitation: editor remains a WPF TextBox, not a syntax-highlighting editor. Auto-pairing is not syntax-aware and indentation is basic.
 - Next workspace priorities after verification: find/replace, Go To Line, editor zoom/font controls, line numbers, syntax highlighting, and proper diagnostics/build output integration.
 
-## Current UI / integration status
+## Current WinOS-Editor workspace status
 
-- `FWTree` and `ProjectTree` already exist in XAML.
-- `ProjectTree` currently lists project source files; double-click opens a file.
-- `FWTreeDoubleClick` is currently empty.
-- The analyzer is **not yet connected to the UI**.
-- The code editor is currently a WPF `TextBox`; line/column navigation can initially use its text and caret position.
-- `RefreshProjectTree()` currently builds the source-file list.
-- `TestClangAsync()` exists in `MainWindow.xaml.cs` but is not wired to a UI action.
-- LLVM detection runs through the existing `ToolchainManager`.
+- The analyzer is connected to both hierarchy panels. Project Hierarchy groups symbols by source file; Framework Hierarchy merges symbols across files.
+- Both hierarchy search boxes filter their trees while preserving source-file grouping and parent paths.
+- Symbol tree items expose available authored documentation, types, parameters, and source locations in tooltips. Double-click navigation is wired in both trees.
+- The editor remains a WPF TextBox per document tab.
+- Workspace features: bracket/quote pairing, paired Backspace, smart Enter indentation, Tab/Shift+Tab indentation, per-tab close buttons, modified-document prompts, save/close shortcuts, tab navigation shortcuts, caret line/column status, and project open-document restoration.
+- Latest additions: Find, Replace All, Go To Line, editor zoom, Ctrl+F/Ctrl+H/Ctrl+G, Ctrl+Plus/Ctrl+Minus, compiler diagnostics, and compile-to-object build.
+- Build currently compiles each C/C++ source independently to Build/obj/*.obj. It does not link or package .wdll files yet.
+- LLVM is user-installed and detected through ToolchainManager; it is not bundled.
+- .gitignore now ignores future bin/ and obj/ output. Previously committed generated artifacts remain tracked until explicitly removed from Git.
+- Recent workspace changes have not been built or runtime-tested in this environment. Treat them as unverified until the user builds locally.
 
-## Immediate task: connect analyzer to hierarchy UI
+## Next workspace priorities
 
-Implement this incrementally, keeping existing styling:
-
-1. Add analyzer state/initialization in `MainWindow.xaml.cs`, using the detected LLVM path from the existing toolchain manager. Inspect the current toolchain manager API rather than guessing property names.
-2. Analyze each supported project source file asynchronously when a project is opened or source files change. Avoid blocking the WPF UI thread.
-3. Store results by source-file path so Project Hierarchy can show each file's symbols and Framework Hierarchy can show the combined symbol tree.
-4. Populate the existing `ProjectTree` and `FWTree` with nested `TreeViewItem` objects. Preserve the source-file nodes in Project Hierarchy.
-5. Wire search boxes to filter their respective trees without losing the underlying analysis results.
-6. Implement symbol double-click navigation using `Symbol.FilePath`, `Line`, and `Column`; keep file double-click behavior intact.
-
-Do not start a separate build-system implementation until the analyzer/UI integration is coherent.
-
-## Working agreement
-
-- User prefers learning while building: explain why each change is needed and what the code does.
-- Ask one focused question when a design choice is genuinely unresolved; otherwise proceed with a clear recommendation.
-- Make small, coherent implementation steps and specify exact file placement.
-- Do not claim compilation, runtime validation, or tests passed unless actually run.
-- Do not change remote GitHub files unless the user explicitly says the repo is updated or directly asks for a remote edit.
+1. Verify the new commands and editor interactions with a local build.
+2. Replace the plain WPF TextBox with a suitable editor surface before attempting robust line numbers and C++ syntax highlighting.
+3. Improve compiler diagnostics by parsing Clang file/line/column output into clickable diagnostics.
+4. Extend the custom build stage into deterministic object naming, linking, and eventual .wdll packaging, with framework metadata and target architecture settings.
+5. Validate the analyzer against a representative C++ test suite, especially headers, templates, macros, overloads, and source attribution.
