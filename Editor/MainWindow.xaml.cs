@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System.IO;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -25,6 +26,9 @@ namespace WinOS_Editor
 
         private readonly Dictionary<string, List<Symbol>> _fileSymbols =
             new(StringComparer.OrdinalIgnoreCase);
+
+        private double _editorFontSize = 14;
+        private string _lastSearchText = "";
 
         public MainWindow()
         {
@@ -637,6 +641,31 @@ namespace WinOS_Editor
                 EditorTabs.SelectedIndex = next;
                 e.Handled = true;
             }
+            else if (e.Key == Key.F)
+            {
+                ShowFindDialog(this, new RoutedEventArgs());
+                e.Handled = true;
+            }
+            else if (e.Key == Key.H)
+            {
+                ShowReplaceDialog(this, new RoutedEventArgs());
+                e.Handled = true;
+            }
+            else if (e.Key == Key.G)
+            {
+                ShowGoToLineDialog(this, new RoutedEventArgs());
+                e.Handled = true;
+            }
+            else if (e.Key is Key.OemPlus or Key.Add)
+            {
+                ZoomIn(this, new RoutedEventArgs());
+                e.Handled = true;
+            }
+            else if (e.Key is Key.OemMinus or Key.Subtract)
+            {
+                ZoomOut(this, new RoutedEventArgs());
+                e.Handled = true;
+            }
         }
 
         private void MainWindowClosing(object? sender, System.ComponentModel.CancelEventArgs e)
@@ -1102,6 +1131,230 @@ namespace WinOS_Editor
             {
                 CurrentProject.ActiveDocumentPath = null;
             }
+        }
+
+
+        private TextBox? ActiveEditor =>
+            EditorTabs.SelectedItem is TabItem tab ? tab.Content as TextBox : null;
+
+        private string? PromptForText(string title, string prompt, string initialValue = "")
+        {
+            Window dialog = new()
+            {
+                Title = title, Owner = this,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                SizeToContent = SizeToContent.WidthAndHeight,
+                ResizeMode = ResizeMode.NoResize, ShowInTaskbar = false
+            };
+            StackPanel panel = new() { Margin = new Thickness(14), MinWidth = 330 };
+            panel.Children.Add(new TextBlock { Text = prompt, Margin = new Thickness(0, 0, 0, 8) });
+            TextBox input = new() { Text = initialValue, MinWidth = 300, Margin = new Thickness(0, 0, 0, 12) };
+            panel.Children.Add(input);
+            StackPanel buttons = new() { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
+            Button accept = new() { Content = "OK", MinWidth = 72, IsDefault = true, Margin = new Thickness(0, 0, 8, 0) };
+            Button cancel = new() { Content = "Cancel", MinWidth = 72, IsCancel = true };
+            accept.Click += (_, _) => dialog.DialogResult = true;
+            buttons.Children.Add(accept);
+            buttons.Children.Add(cancel);
+            panel.Children.Add(buttons);
+            dialog.Content = panel;
+            dialog.Loaded += (_, _) => { input.Focus(); input.SelectAll(); };
+            return dialog.ShowDialog() == true ? input.Text : null;
+        }
+
+        private void ShowFindDialog(object sender, RoutedEventArgs e)
+        {
+            if (ActiveEditor == null) return;
+            string? query = PromptForText("Find", "Find:", _lastSearchText);
+            if (string.IsNullOrEmpty(query)) return;
+            _lastSearchText = query;
+            FindNext(query);
+        }
+
+        private void FindNext(string query)
+        {
+            TextBox? editor = ActiveEditor;
+            if (editor == null || string.IsNullOrEmpty(query)) return;
+            int start = Math.Min(editor.SelectionStart + editor.SelectionLength, editor.Text.Length);
+            int index = editor.Text.IndexOf(query, start, StringComparison.OrdinalIgnoreCase);
+            if (index < 0) index = editor.Text.IndexOf(query, 0, StringComparison.OrdinalIgnoreCase);
+            if (index < 0)
+            {
+                MessageBox.Show("Could not find '" + query + "'.", "Find",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            editor.Focus();
+            editor.Select(index, query.Length);
+            editor.ScrollToLine(editor.GetLineIndexFromCharacterIndex(index));
+        }
+
+        private void ShowReplaceDialog(object sender, RoutedEventArgs e)
+        {
+            TextBox? editor = ActiveEditor;
+            if (editor == null) return;
+            string? find = PromptForText("Replace", "Find:", _lastSearchText);
+            if (string.IsNullOrEmpty(find)) return;
+            string? replacement = PromptForText("Replace", "Replace with:", "");
+            if (replacement == null) return;
+            _lastSearchText = find;
+            editor.Text = editor.Text.Replace(find, replacement, StringComparison.OrdinalIgnoreCase);
+            editor.Focus();
+        }
+
+        private void ShowGoToLineDialog(object sender, RoutedEventArgs e)
+        {
+            TextBox? editor = ActiveEditor;
+            if (editor == null) return;
+            string? value = PromptForText("Go To Line", "Line number:");
+            if (!int.TryParse(value, out int requestedLine) || requestedLine < 1) return;
+            int line = Math.Clamp(requestedLine - 1, 0, editor.LineCount - 1);
+            editor.Focus();
+            editor.CaretIndex = editor.GetCharacterIndexFromLineIndex(line);
+            editor.ScrollToLine(line);
+        }
+
+        private void ZoomIn(object sender, RoutedEventArgs e)
+        {
+            _editorFontSize = Math.Min(32, _editorFontSize + 1);
+            ApplyEditorZoom();
+        }
+
+        private void ZoomOut(object sender, RoutedEventArgs e)
+        {
+            _editorFontSize = Math.Max(8, _editorFontSize - 1);
+            ApplyEditorZoom();
+        }
+
+        private void ResetZoom(object sender, RoutedEventArgs e)
+        {
+            _editorFontSize = 14;
+            ApplyEditorZoom();
+        }
+
+        private void ApplyEditorZoom()
+        {
+            foreach (TabItem tab in EditorTabs.Items)
+                if (tab.Content is TextBox editor) editor.FontSize = _editorFontSize;
+        }
+
+        private async void CheckForErrorsClick(object sender, RoutedEventArgs e)
+        {
+            if (CurrentProject == null || string.IsNullOrEmpty(CurrentProjectPath))
+            {
+                MessageBox.Show("Open a framework project first.");
+                return;
+            }
+            if (!_toolchainManager.IsAvailable)
+            {
+                MessageBox.Show("LLVM/Clang was not found. Install LLVM and ensure clang++.exe is on PATH.");
+                return;
+            }
+
+            DiagnosticsOutput.Clear();
+            DiagnosticsOutput.AppendText("Checking project sources...\n");
+            string directory = Path.GetDirectoryName(CurrentProjectPath)!;
+            int failures = 0;
+            foreach (string relative in CurrentProject.SourceFiles)
+            {
+                string extension = Path.GetExtension(relative).ToLowerInvariant();
+                if (extension is not (".cpp" or ".cc" or ".cxx" or ".c")) continue;
+                string source = Path.GetFullPath(Path.Combine(directory, relative));
+                if (!File.Exists(source)) continue;
+                try
+                {
+                    var result = await _toolchainManager.RunClangAsync(source);
+                    string output = (result.Errors + Environment.NewLine + result.Output).Trim();
+                    if (!string.IsNullOrWhiteSpace(output)) DiagnosticsOutput.AppendText(output + Environment.NewLine);
+                    if (result.ExitCode != 0) failures++;
+                }
+                catch (Exception ex)
+                {
+                    failures++;
+                    DiagnosticsOutput.AppendText(source + ": " + ex.Message + "\n");
+                }
+            }
+            DiagnosticsOutput.AppendText(failures == 0
+                ? "\nCheck complete: no compiler errors reported."
+                : "\nCheck complete: " + failures + " source file(s) reported errors.");
+        }
+
+        private async void BuildProjectClick(object sender, RoutedEventArgs e)
+        {
+            if (CurrentProject == null || string.IsNullOrEmpty(CurrentProjectPath))
+            {
+                MessageBox.Show("Open a framework project first.");
+                return;
+            }
+            if (!_toolchainManager.IsAvailable)
+            {
+                MessageBox.Show("LLVM/Clang was not found. Install LLVM and ensure clang++.exe is on PATH.");
+                return;
+            }
+
+            string projectDirectory = Path.GetDirectoryName(CurrentProjectPath)!;
+            string outputDirectory = Path.Combine(projectDirectory, "Build", "obj");
+            Directory.CreateDirectory(outputDirectory);
+            BuildOutput.Clear();
+            BuildOutput.AppendText("Compiling source files to object files...\n");
+            int compiled = 0;
+            int failures = 0;
+
+            foreach (string relative in CurrentProject.SourceFiles)
+            {
+                string extension = Path.GetExtension(relative).ToLowerInvariant();
+                if (extension is not (".cpp" or ".cc" or ".cxx" or ".c")) continue;
+                string source = Path.GetFullPath(Path.Combine(projectDirectory, relative));
+                if (!File.Exists(source))
+                {
+                    failures++;
+                    BuildOutput.AppendText("[MISSING] " + source + "\n");
+                    continue;
+                }
+
+                string objectName = Path.GetFileNameWithoutExtension(relative) + ".obj";
+                string objectPath = Path.Combine(outputDirectory, objectName);
+                ProcessStartInfo start = new()
+                {
+                    FileName = Path.Combine(_toolchainManager.LLVMPath!, "clang++.exe"),
+                    WorkingDirectory = projectDirectory,
+                    UseShellExecute = false, RedirectStandardOutput = true,
+                    RedirectStandardError = true, CreateNoWindow = true
+                };
+                start.ArgumentList.Add("-c");
+                start.ArgumentList.Add(source);
+                start.ArgumentList.Add("-o");
+                start.ArgumentList.Add(objectPath);
+
+                try
+                {
+                    using Process process = new() { StartInfo = start };
+                    process.Start();
+                    Task<string> stdout = process.StandardOutput.ReadToEndAsync();
+                    Task<string> stderr = process.StandardError.ReadToEndAsync();
+                    await process.WaitForExitAsync();
+                    string messages = (await stderr + Environment.NewLine + await stdout).Trim();
+                    if (!string.IsNullOrWhiteSpace(messages)) BuildOutput.AppendText(messages + Environment.NewLine);
+                    if (process.ExitCode == 0)
+                    {
+                        compiled++;
+                        BuildOutput.AppendText("[OK] " + relative + " -> " + objectPath + "\n");
+                    }
+                    else
+                    {
+                        failures++;
+                        BuildOutput.AppendText("[FAILED] " + relative + "\n");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    failures++;
+                    BuildOutput.AppendText("[FAILED] " + relative + ": " + ex.Message + "\n");
+                }
+            }
+
+            BuildOutput.AppendText("\nCompile stage finished. Successful: " + compiled + "; Failed: " + failures + ".");
+            BuildOutput.AppendText("\nThis stage creates .obj files only; linking and .wdll packaging remain future build-system work.");
         }
 
         private async Task TestClangAsync()
