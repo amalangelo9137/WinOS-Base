@@ -1,3 +1,6 @@
+#define PROJ L"WinOS-EFI"
+#define FILE L"main.c"
+
 // my own implementation attempt of WinOS.
 // Welcome to WinOS (not WinOS-Dev)!
 #include <Guid/FileInfo.h>
@@ -18,8 +21,16 @@
 #include <Uefi/UefiSpec.h>
 #include <stdint.h>
 
+#include "Debug.h"
+
 extern CONST UINT32 _gUefiDriverRevision = 0;
 CHAR8* gEfiCallerBaseName = "WinOS";
+
+#define DEBUG_FILE L"main.c"
+
+#define INFO L"i"
+#define WARN L"!"
+#define ERROR L"X"
 
 BOOT_CONFIG BootConfig;
 
@@ -279,20 +290,15 @@ static void* LoadFileIntoRAM(EFI_FILE* Directory, CHAR16* Path, UINTN* LoadedSiz
 
 	if (EFI_ERROR(Status))
 	{
-		Print(L"[X] WinOS-EFI/main.c/LoadFileIntoRAM()> Failed to read file\n");
-		Print(L"    Path: %s\n", Path);
-		Print(L"    Buffer: %p\n", FileBuffer);
-		Print(L"    Expected size: %u bytes\n", ExpectedFileSize);
-		Print(L"    Bytes read: %u bytes\n", FileSize);
-		Print(L"    Pages allocated: %u\n", NumPages);
-		Print(L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"Failed to read file;\n	Path: %s,\n	Buffer: %p,\n	Expected size: %u bytes,\n	Bytes read: %u bytes,\n	Pages allocated: %u,\n	Status: %r",
+			Path, FileBuffer, ExpectedFileSize, FileSize, NumPages, Status);
 
 		Status = LoadedFile->Close(LoadedFile);
 
 		if (EFI_ERROR(Status))
 		{
-			Print(L"[!] WinOS-EFI/main.c/LoadFileIntoRAM()> Failed to close file after read error\n");
-			Print(L"    Status: %r\n", Status);
+			DEBUG_PRINT(ERROR, L"Failed to close file after read error;\n	Status: %r",
+				Status);
 		}
 
 		//
@@ -304,10 +310,8 @@ static void* LoadFileIntoRAM(EFI_FILE* Directory, CHAR16* Path, UINTN* LoadedSiz
 
 		if (EFI_ERROR(Status))
 		{
-			Print(L"[!] WinOS-EFI/main.c/LoadFileIntoRAM()> Failed to free file buffer\n");
-			Print(L"    Address: %p\n", FileBuffer);
-			Print(L"    Pages: %u\n", NumPages);
-			Print(L"    Status: %r\n", Status);
+			DEBUG_PRINT(ERROR, L"Failed to free file buffer;\n	Address: %p,\n	Pages: %u,\n	Status: %r",
+				FileBuffer, NumPages, Status);
 		}
 
 		return NULL;
@@ -320,9 +324,8 @@ static void* LoadFileIntoRAM(EFI_FILE* Directory, CHAR16* Path, UINTN* LoadedSiz
 
 	if (EFI_ERROR(Status))
 	{
-		Print(L"[!] WinOS-EFI/main.c/LoadFileIntoRAM()> File loaded but Close() failed\n");
-		Print(L"    Path: %s\n", Path);
-		Print(L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"File loaded, but Close() failed;\n	Path: %s,\n	Status: %r",
+			Path, Status);
 
 		//
 		// The file contents were successfully loaded, so the buffer
@@ -338,20 +341,16 @@ static void* LoadFileIntoRAM(EFI_FILE* Directory, CHAR16* Path, UINTN* LoadedSiz
 		*LoadedSize = FileSize;
 	}
 
-	Print(L"[i] WinOS-EFI/main.c/LoadFileIntoRAM()> File loaded successfully\n");
-	Print(L"    Path: %s\n", Path);
-	Print(L"    Buffer: %p\n", FileBuffer);
-	Print(L"    Expected size: %u bytes\n", ExpectedFileSize);
-	Print(L"    Loaded size: %u bytes\n", FileSize);
-	Print(L"    Pages: %u\n", NumPages);
+	DEBUG_PRINT(INFO, L"File loaded successfully;\n	Path: %s,\n	Buffer: %p,\n	Expected Size: %u bytes,\n	Loaded Size: %u bytes,\n	Pages allocated: %u",
+		Path, FileBuffer, ExpectedFileSize, FileSize, NumPages);
 
 	if (LoadedSize != NULL)
 	{
-		Print(L"    LoadedSize output: %u\n", *LoadedSize);
+		Print(L"	LoadedSize output: %u\n", *LoadedSize);
 	}
 	else
 	{
-		Print(L"    LoadedSize output: NULL\n");
+		Print(L"	LoadedSize output: NULL\n");
 	}
 
 	return FileBuffer;
@@ -398,7 +397,7 @@ static void CheckIndexFile(void* IndexRaw, ASSET_TABLE* Table, EFI_FILE* RootDir
 				if (expectedType != AssetTypeUnknown &&
 					actualType != AssetTypeUnknown &&
 					expectedType != actualType) {
-					Print(L"[!] WinOS-EFI/main.c/CheckIndexFile()> Skipping mismatched asset type: %a\n", NameStart);
+					DEBUG_PRINT(WARN, L"Skipping mismatched asset type : % a\n", NameStart);
 					continue;
 				}
 
@@ -413,46 +412,60 @@ static void CheckIndexFile(void* IndexRaw, ASSET_TABLE* Table, EFI_FILE* RootDir
 }
 
 /// <summary>
-/// Allocates a back buffer for smooth graphics. Idk if we need it after we have a graphics driver loaded.
-/// </summary>
-/// <returns>{boot configuration variable}.BackBuffer or smth lol</returns>
-static uint32_t* AllocateBackBuffer() {
-	Print(L"[i] WinOS-EFI/main.c/AllocateBackBuffer()> Allocating a back buffer...\n");
-
-	UINTN FBSize = BootConfig.Width * BootConfig.Height * 4;
-	Print(L"[i] WinOS-EFI/main.c/AllocateBackBuffer()> Frame Buffer size = %u\n", FBSize);
-
-	UINTN FBPages = (FBSize + 4095) / 4096;
-	Print(L"[i] WinOS-EFI/main.c/AllocateBackBuffer()> Frame Buffer pages = %u\n", FBPages);
-
-	EFI_PHYSICAL_ADDRESS BBAddr;
-	if (EFI_ERROR(gBS->AllocatePages(AllocateAnyPages, EfiLoaderData, FBPages, &BBAddr)))
-	{
-		Print(L"[X] WinOS-EFI/main.c/AllocateBackBuffer()> Back Buffer allocation failed!\n");
-		return NULL;
-	}
-	else
-	{
-		Print(L"[i] WinOS-EFI/main.c/AllocateBackBuffer()> Back Buffer allocation success!\n");
-		return (uint32_t*)BBAddr;
-	}
-}
-
-/// <summary>
 /// Build boot configurations (init).
 /// </summary>
 void BuildBootConfig(ASSET_TABLE* Table, EFI_GRAPHICS_OUTPUT_PROTOCOL* GOP) {
-	Print(L"[i] WinOS-EFI/main.c/BuildBootConfig()> Building BootConfig...\n");
+	DEBUG_PRINT(INFO, L"Building BootConfig...");
 
 	BootConfig.Assets = Table;
-	BootConfig.BaseAddress = (uint32_t*)GOP->Mode->FrameBufferBase;
-	BootConfig.Width = GOP->Mode->Info->HorizontalResolution;
-	BootConfig.Height = GOP->Mode->Info->VerticalResolution;
-	BootConfig.PixelsPerScanLine = GOP->Mode->Info->PixelsPerScanLine;
-	BootConfig.PixelFormat = (BOOT_PIXEL_FORMAT)GOP->Mode->Info->PixelFormat;
-	BootConfig.BackBuffer = AllocateBackBuffer();
 
-	Print(L"[i] WinOS-EFI/main.c/BuildBootConfig()> Successfully built BootConfig :D\n");
+	BootConfig.GOPExports.FBAddress = GOP->Mode->FrameBufferBase;
+	DEBUG_PRINT(INFO, L"Framebuffer Address: 0x%lx", BootConfig.GOPExports.FBAddress);
+	BootConfig.GOPExports.FBSize = GOP->Mode->FrameBufferSize;
+	DEBUG_PRINT(INFO, L"Framebuffer Size: %lu bytes", BootConfig.GOPExports.FBSize);
+
+	BootConfig.GOPExports.HorizontalResolution = GOP->Mode->Info->HorizontalResolution;
+	DEBUG_PRINT(INFO, L"Horizontal Resolution: %u px", BootConfig.GOPExports.HorizontalResolution);
+	BootConfig.GOPExports.VerticalResolution = GOP->Mode->Info->VerticalResolution;
+	DEBUG_PRINT(INFO, L"Vertical Resolution: %u px", BootConfig.GOPExports.VerticalResolution);
+	BootConfig.GOPExports.PixelsPerScanLine = GOP->Mode->Info->PixelsPerScanLine;
+	DEBUG_PRINT(INFO, L"Pixels Per Scan Line: %u px", BootConfig.GOPExports.PixelsPerScanLine);
+
+	BootConfig.GOPExports.PixelBitmask.RMask =
+		GOP->Mode->Info->PixelInformation.RedMask;
+
+	BootConfig.GOPExports.PixelBitmask.GMask =
+		GOP->Mode->Info->PixelInformation.GreenMask;
+
+	BootConfig.GOPExports.PixelBitmask.BMask =
+		GOP->Mode->Info->PixelInformation.BlueMask;
+
+	BootConfig.GOPExports.PixelBitmask.ResMask =
+		GOP->Mode->Info->PixelInformation.ReservedMask;
+
+	switch (GOP->Mode->Info->PixelFormat) {
+	case PixelRedGreenBlueReserved8BitPerColor:
+		BootConfig.GOPExports.PixelFormat = RGB8Bit;
+		break;
+
+	case PixelBlueGreenRedReserved8BitPerColor:
+		BootConfig.GOPExports.PixelFormat = BGR8Bit;
+		break;
+
+	case PixelBitMask:
+		BootConfig.GOPExports.PixelFormat = BitMask;
+		break;
+
+	case PixelBltOnly:
+		BootConfig.GOPExports.PixelFormat = BltOnly;
+		break;
+
+	default:
+		BootConfig.GOPExports.PixelFormat = FormatMax;
+		break;
+	}
+
+	DEBUG_PRINT(INFO, L"Succesfully built BootConfig!");
 }
 
 EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* SystemTable)
@@ -744,14 +757,12 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	Print(L"[i] WinOS-EFI/main.c/UefiMain()> BootConfig ready\n");
 	Print(L"    Assets: %p\n", BootConfig.Assets);
-	Print(L"    FrameBuffer: %p\n", BootConfig.BaseAddress);
+	Print(L"    FrameBuffer: %p\n", BootConfig.GOPExports.FBAddress);
 	Print(L"    Resolution: %u x %u\n",
-		BootConfig.Width,
-		BootConfig.Height);
+		BootConfig.GOPExports.HorizontalResolution,
+		BootConfig.GOPExports.VerticalResolution);
 	Print(L"    PixelsPerScanLine: %u\n",
-		BootConfig.PixelsPerScanLine);
-	Print(L"    BackBuffer: %p\n",
-		BootConfig.BackBuffer);
+		BootConfig.GOPExports.PixelsPerScanLine);
 
 	//
 	// ------------------------------------------------------------

@@ -88,15 +88,15 @@ extern "C" __declspec(dllexport) void KernelMain(BOOT_CONFIG* config) {
 	const auto& framebuffer = WinOS::Graphics::GetFramebuffer();
 
 	// Framebuffer configuration tracking variables
-	uint8_t* fb_base = (uint8_t*)config->BaseAddress;
-	uint64_t fb_size = (uint64_t)config->PixelsPerScanLine * config->Height * 4;
+	uint64_t* fb_base = (uint64_t*)config->GOPExports.FBAddress;
+	uint64_t fb_size = config->GOPExports.FBSize;
 
 	// Round size up to power-of-two for physical MTRR register alignment validation
 	uint64_t mtrr_size = 1ULL;
 	while (mtrr_size < fb_size) {
 		mtrr_size <<= 1;
 	}
-	EnableWriteCombining((uint64_t)config->BaseAddress, mtrr_size);
+	EnableWriteCombining(config->GOPExports.FBAddress, mtrr_size);
 
 	// Remap the virtual page descriptors to apply Write-Through cache flags
 	for (uint64_t offset = 0; offset < fb_size; offset += 4096) {
@@ -113,10 +113,10 @@ extern "C" __declspec(dllexport) void KernelMain(BOOT_CONFIG* config) {
 			uint32_t color = WinOS_Logo[src_y * LOGO_SRC_WIDTH + src_x];
 			if (color == 0x00000000) continue;
 
-			int target_x = ((config->Width / 2) - (LOGO_TARGET_WIDTH / 2)) + x;
-			int target_y = ((config->Height / 2) - (LOGO_TARGET_HEIGHT / 2)) + y;
+			int target_x = ((config->GOPExports.HorizontalResolution / 2) - (LOGO_TARGET_WIDTH / 2)) + x;
+			int target_y = ((config->GOPExports.VerticalResolution / 2) - (LOGO_TARGET_HEIGHT / 2)) + y;
 
-			if (target_x >= 0 && target_x < config->Width && target_y >= 0 && target_y < config->Height) {
+			if (target_x >= 0 && target_x < config->GOPExports.HorizontalResolution && target_y >= 0 && target_y < config->GOPExports.VerticalResolution) {
 				framebuffer.Address[target_y * framebuffer.PixelsPerScanLine + target_x] = color;
 			}
 		}

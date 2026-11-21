@@ -43,6 +43,7 @@
     <ClInclude Include="Drivers\Audio\AudioDriver.h" />
     <ClInclude Include="Graphics\Graphics.h" />
     <ClInclude Include="HIDs\HIDs.h" />
+    <ClInclude Include="main.h" />
     <ClInclude Include="WinOSBaseAssets\WinOS-Logo.h" />
     <ClInclude Include="WinOSBaseAssets\WinOS-Throbber.h" />
   </ItemGroup>

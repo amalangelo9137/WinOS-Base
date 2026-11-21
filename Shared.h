@@ -36,27 +36,38 @@ typedef struct {
 
 typedef enum {
 	RGB8Bit,
-	BGR8BitPer,
+	BGR8Bit,
 	BitMask,
 	BltOnly,
 	FormatMax
-} BOOT_PIXEL_FORMAT; // straight from the efi definition
+} BOOT_PIXEL_FORMAT; // straight from the efi definition, names edited
+
+typedef struct {
+	uint32_t RMask;
+	uint32_t GMask;
+	uint32_t BMask;
+	uint32_t ResMask;
+} BOOT_PIXEL_BITMASK; // straight from the efi definition, names edited
+
+typedef struct {
+	// base
+	uint64_t FBAddress; // where the framebuffer is located.
+	uint64_t FBSize; // size of the framebuffer
+
+	// resolution
+	uint32_t HorizontalResolution;
+	uint32_t VerticalResolution;
+	uint32_t PixelsPerScanLine;
+
+	// advanced
+	BOOT_PIXEL_FORMAT PixelFormat;
+	BOOT_PIXEL_BITMASK PixelBitmask;
+} GOP_EXPORTS; // snapshot of the EFI GOP
 
 // The ultimate payload handed to the Kernel
 typedef struct {
 	// graphics related sht
-	uint32_t* BaseAddress; // location of the screen pixels
-	uint32_t* BackBuffer; // soon to be deprecated
-	uint32_t  Width; // screen width
-	uint32_t  Height; // screen height
-	uint32_t  PixelsPerScanLine; // dk lol
-
-	BOOT_PIXEL_FORMAT PixelFormat; // how pixels are arranged in the buffer
-
-	uint32_t RedMask;
-	uint32_t GreenMask;
-	uint32_t BlueMask;
-	uint32_t ReservedMask;
+	GOP_EXPORTS GOPExports;
 
 	MOUSE_STATE* Mouse;
 	PSF1_HEADER* Font;
