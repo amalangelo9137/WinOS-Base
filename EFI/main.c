@@ -410,7 +410,6 @@ static void CheckIndexFile(void* IndexRaw, ASSET_TABLE* Table, EFI_FILE* RootDir
 			}
 		}
 	}
-
 }
 
 /// <summary>
@@ -450,6 +449,7 @@ void BuildBootConfig(ASSET_TABLE* Table, EFI_GRAPHICS_OUTPUT_PROTOCOL* GOP) {
 	BootConfig.Width = GOP->Mode->Info->HorizontalResolution;
 	BootConfig.Height = GOP->Mode->Info->VerticalResolution;
 	BootConfig.PixelsPerScanLine = GOP->Mode->Info->PixelsPerScanLine;
+	BootConfig.PixelFormat = GOP->Mode->Info->PixelFormat;
 	BootConfig.BackBuffer = AllocateBackBuffer();
 
 	Print(L"[i] WinOS-EFI/main.c/BuildBootConfig()> Successfully built BootConfig :D\n");
@@ -496,7 +496,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	Print(L"    PixelsPerScanLine: %u\n",
 		GOP->Mode->Info->PixelsPerScanLine);
 
-
 	//
 	// ------------------------------------------------------------
 	// 2. Get Loaded Image Protocol
@@ -525,7 +524,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	Print(L"    LoadedImage: %p\n", LoadedImage);
 	Print(L"    DeviceHandle: %p\n", LoadedImage->DeviceHandle);
 
-
 	//
 	// ------------------------------------------------------------
 	// 3. Get Simple File System Protocol
@@ -553,7 +551,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Simple File System Protocol located\n");
 	Print(L"    FileSystem: %p\n", FileSystem);
 
-
 	//
 	// ------------------------------------------------------------
 	// 4. Open filesystem volume
@@ -580,7 +577,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Filesystem volume opened\n");
 	Print(L"    RootDir: %p\n", RootDir);
 
-
 	//
 	// ------------------------------------------------------------
 	// 5. Reset root directory position
@@ -606,7 +602,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	}
 
 	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Root directory position reset\n");
-
 
 	//
 	// ------------------------------------------------------------
@@ -637,7 +632,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 		Print(L"[i] WinOS-EFI/main.c/UefiMain()> index.wfs loaded\n");
 		Print(L"    Address: %p\n", IndexRaw);
 	}
-
 
 	//
 	// ------------------------------------------------------------
@@ -681,7 +675,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	Print(L"    Address: %p\n", Table);
 	Print(L"    Size: %u bytes\n", sizeof(ASSET_TABLE));
 
-
 	//
 	// ------------------------------------------------------------
 	// 8. Allocate asset entries
@@ -719,7 +712,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	Print(L"    Maximum entries: %u\n", MaxAssetEntries);
 	Print(L"    Buffer size: %u bytes\n", AssetEntriesSize);
 
-
 	//
 	// ------------------------------------------------------------
 	// 9. Parse index
@@ -736,7 +728,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Asset index processing complete\n");
 	Print(L"    Asset count: %u\n", Table->Count);
-
 
 	//
 	// ------------------------------------------------------------
@@ -761,7 +752,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 		BootConfig.PixelsPerScanLine);
 	Print(L"    BackBuffer: %p\n",
 		BootConfig.BackBuffer);
-
 
 	//
 	// ------------------------------------------------------------
@@ -795,7 +785,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	Print(L"    BootConfig.Font: %p\n",
 		BootConfig.Font);
 
-
 	//
 	// ------------------------------------------------------------
 	// 12. Load kernel
@@ -827,7 +816,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Kernel loaded\n");
 	Print(L"    Address: %p\n", KernelRaw);
 	Print(L"    Size: %u bytes\n", KernelFileSize);
-
 
 	//
 	// ------------------------------------------------------------
@@ -864,7 +852,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 		while (TRUE)
 			__halt();
 	}
-
 
 	//
 	// ------------------------------------------------------------
@@ -906,7 +893,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	Print(L"    Offset: %u\n", NTHeaderOffset);
 	Print(L"    Signature: 0x%x\n", NTHeaders->Signature);
 
-
 	//
 	// ------------------------------------------------------------
 	// 15. Validate NT signature
@@ -926,7 +912,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	}
 
 	Print(L"[i] WinOS-EFI/main.c/UefiMain()> PE headers look valid\n");
-
 
 	//
 	// ------------------------------------------------------------
@@ -960,7 +945,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 		NumberOfSections);
 	Print(L"    EntryPoint RVA: 0x%x\n",
 		EntryPointOffset);
-
 
 	//
 	// ------------------------------------------------------------
@@ -1016,7 +1000,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	Print(L"    KernelBase: %p\n", (void*)KernelBase);
 	Print(L"    Pages: %u\n", KernelPages);
 
-
 	//
 	// ------------------------------------------------------------
 	// 18. Copy PE sections into kernel memory
@@ -1053,7 +1036,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Kernel sections copied\n");
 
-
 	//
 	// ------------------------------------------------------------
 	// 19. Calculate kernel entry point
@@ -1073,7 +1055,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 		NTHeaders->OptionalHeader.AddressOfEntryPoint);
 	Print(L"    KernelStart: %p\n",
 		(void*)KernelStart);
-
 
 	//
 	// ------------------------------------------------------------
@@ -1116,7 +1097,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	Print(L"    Descriptor size: %u bytes\n", DSize);
 	Print(L"    Descriptor version: 0x%x\n", DVer);
 
-
 	//
 	// ------------------------------------------------------------
 	// 21. Add safety space and allocate memory map
@@ -1152,7 +1132,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	Print(L"    Address: %p\n", MMap);
 	Print(L"    Capacity: %u bytes\n", MMapSize);
 
-
 	//
 	// ------------------------------------------------------------
 	// 22. Get actual memory map
@@ -1187,7 +1166,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	Print(L"    Descriptor version: 0x%x\n", DVer);
 	Print(L"    Map key: %u\n", MMapKey);
 
-
 	//
 	// ------------------------------------------------------------
 	// 23. Store memory map in BootConfig
@@ -1204,7 +1182,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 		BootConfig.MemMapSize);
 	Print(L"    DescriptorSize: %llu\n",
 		BootConfig.MemMapDescriptorSize);
-
 
 	//
 // ------------------------------------------------------------

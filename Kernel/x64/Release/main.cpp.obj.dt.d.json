@@ -37,7 +37,9 @@
             "c:\\users\\ajxs\\documents\\visualuefi\\winos\\kernel\\crucialinternals\\pmm.h",
             "c:\\users\\ajxs\\documents\\visualuefi\\winos\\shared.h",
             "c:\\program files\\microsoft visual studio\\18\\community\\vc\\tools\\msvc\\14.51.36231\\include\\stdbool.h",
-            "c:\\users\\ajxs\\documents\\visualuefi\\winos\\kernel\\crucialinternals\\vmm.h"
+            "c:\\users\\ajxs\\documents\\visualuefi\\winos\\kernel\\crucialinternals\\vmm.h",
+            "c:\\users\\ajxs\\documents\\visualuefi\\winos\\kernel\\graphics\\graphics.h",
+            "c:\\users\\ajxs\\documents\\visualuefi\\winos\\sdk\\include\\winos\\graphics\\framebuffer.h"
         ],
         "ImportedModules": [],
         "ImportedHeaderUnits": []

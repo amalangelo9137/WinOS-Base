@@ -3,51 +3,67 @@
 #include <stdbool.h>
 
 typedef enum {
-    AssetTypeUnknown = 0,
-    AssetTypeBitmap = 1,
-    AssetTypeGif = 2,
-    AssetTypeAppPackage = 3,
-    AssetTypePsfFont = 4,
+	AssetTypeUnknown = 0,
+	AssetTypeBitmap = 1,
+	AssetTypeGif = 2,
+	AssetTypeAppPackage = 3,
+	AssetTypePsfFont = 4,
 } ASSET_TYPE;
 
 // Represents a single file loaded into RAM by the EFI Index
 typedef struct {
-    char     Name[32];
-    void* Address;
-    uint32_t Size;
-    uint32_t Type;
+	char     Name[32];
+	void* Address;
+	uint32_t Size;
+	uint32_t Type;
 } ASSET_ENTRY;
 
 typedef struct {
-    uint32_t     Count;
-    ASSET_ENTRY* Entries;
+	uint32_t     Count;
+	ASSET_ENTRY* Entries;
 } ASSET_TABLE;
 
 typedef struct {
-    int X, Y;
-    bool Left, Right;
+	int X, Y;
+	bool Left, Right;
 } MOUSE_STATE;
 
 typedef struct {
-    unsigned char Magic[2];     // 0x36, 0x04
-    unsigned char Mode;         // 0 = 256 chars, 1 = 512 chars
-    unsigned char CharSize;     // Height of character in pixels
+	unsigned char Magic[2];     // 0x36, 0x04
+	unsigned char Mode;         // 0 = 256 chars, 1 = 512 chars
+	unsigned char CharSize;     // Height of character in pixels
 } PSF1_HEADER;
+
+typedef enum {
+	PixelRedGreenBlueReserved8BitPerColor,
+	PixelBlueGreenRedReserved8BitPerColor,
+	PixelBitMask,
+	PixelBltOnly,
+	PixelFormatMax
+} BOOT_PIXEL_FORMAT; // straight from the efi definition
 
 // The ultimate payload handed to the Kernel
 typedef struct {
-    uint32_t* BaseAddress;       // The actual screen pixels
-    uint32_t* BackBuffer;        // The hidden drawing canvas
-    uint32_t  Width;
-    uint32_t  Height;
-    uint32_t  PixelsPerScanLine;
+	// graphics related sht
+	uint32_t* BaseAddress; // location of the screen pixels
+	uint32_t* BackBuffer; // soon to be deprecated
+	uint32_t  Width; // screen width
+	uint32_t  Height; // screen height
+	uint32_t  PixelsPerScanLine; // dk lol
 
-    MOUSE_STATE* Mouse;
-    PSF1_HEADER* Font;
-    ASSET_TABLE* Assets;         // The dynamic Index Table
+	BOOT_PIXEL_FORMAT PixelFormat; // how pixels are arranged in the buffer
 
-    // Pure pointers to avoid breaking compiler cross-compatibility
-    void* MemMap;
-    uint64_t  MemMapSize;
-    uint64_t  MemMapDescriptorSize;
+	uint32_t RedMask;
+	uint32_t GreenMask;
+	uint32_t BlueMask;
+	uint32_t ReservedMask;
+
+	MOUSE_STATE* Mouse;
+	PSF1_HEADER* Font;
+	ASSET_TABLE* Assets;         // The dynamic Index Table
+
+	// Pure pointers to avoid breaking compiler cross-compatibility
+	void* MemMap;
+	uint64_t  MemMapSize;
+	uint64_t  MemMapDescriptorSize;
 } BOOT_CONFIG;

@@ -1,0 +1,9 @@
+C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\AJXS\Bits\Bits.cpp;C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\x64\Release\Bits.obj
+C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\AJXS\Math\Math.cpp;C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\x64\Release\Math.obj
+C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\AJXS\Math\Memory\Memory.cpp;C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\x64\Release\Memory.obj
+C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\CrucialInternals\GDT.cpp;C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\x64\Release\GDT.obj
+C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\CrucialInternals\IDT.cpp;C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\x64\Release\IDT.obj
+C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\CrucialInternals\MathFunctions.cpp;C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\x64\Release\MathFunctions.obj
+C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\Graphics\Graphics.cpp;C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\x64\Release\Graphics.obj
+C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\HIDs\Drivers.cpp;C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\x64\Release\Drivers.obj
+C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\main.cpp;C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\x64\Release\main.obj

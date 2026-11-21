@@ -12,11 +12,12 @@
 // shared between uefi app and kernel
 #include "Shared.h"
 
+#include "Graphics/Graphics.h"
+
 extern "C" void InitGDT();
 extern "C" void InitIDT();
 
 extern "C" BOOT_CONFIG* GlobalConfig = nullptr;
-
 
 // logo res
 constexpr auto LOGO_TARGET_WIDTH = 256;
@@ -83,6 +84,9 @@ extern "C" __declspec(dllexport) void KernelMain(BOOT_CONFIG* config) {
 	PMM.Initialize(config->MemMap, config->MemMapSize, config->MemMapDescriptorSize);
 	VMM.Initialize();
 
+	WinOS::Graphics::Initialize(config);
+	const auto& framebuffer = WinOS::Graphics::GetFramebuffer();
+
 	// Framebuffer configuration tracking variables
 	uint8_t* fb_base = (uint8_t*)config->BaseAddress;
 	uint64_t fb_size = (uint64_t)config->PixelsPerScanLine * config->Height * 4;
@@ -113,12 +117,11 @@ extern "C" __declspec(dllexport) void KernelMain(BOOT_CONFIG* config) {
 			int target_y = ((config->Height / 2) - (LOGO_TARGET_HEIGHT / 2)) + y;
 
 			if (target_x >= 0 && target_x < config->Width && target_y >= 0 && target_y < config->Height) {
-				config->BaseAddress[target_y * config->PixelsPerScanLine + target_x] = color;
+				framebuffer.Address[target_y * framebuffer.PixelsPerScanLine + target_x] = color;
 			}
 		}
 	}
 
 	while (true) {
-
 	}
 }

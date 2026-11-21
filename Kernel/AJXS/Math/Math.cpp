@@ -2,22 +2,24 @@
 
 namespace Math
 {
-	static uint64_t Floor(uint64_t value) {
+	uint64_t Floor(uint64_t value) {
 		return value; // because value is an unsigned int, which is already floored
 	}
 
-	static double Floor(double value) {
+	double Floor(double value) {
 		// TODO
+		return value;
 	}
 
-	static uint64_t Ceil(uint64_t numerator, uint64_t denominator) {
+	uint64_t Ceil(uint64_t numerator, uint64_t denominator) {
 		if (numerator % denominator != 0)
 			return (numerator / denominator) + 1;
 		else
 			return numerator / denominator;
 	}
 
-	static double Ceil(double value) {
+	double Ceil(double value) {
 		// TODO
+		return value;
 	}
 }

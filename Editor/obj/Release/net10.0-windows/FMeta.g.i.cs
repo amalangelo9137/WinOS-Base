@@ -85,7 +85,7 @@ namespace WinOS_Editor {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/WinOS-Editor;component/fmeta.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/WinOS-Editor;V1.0.0.0;component/fmeta.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\FMeta.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

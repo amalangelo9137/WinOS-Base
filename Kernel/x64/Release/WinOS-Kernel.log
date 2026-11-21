@@ -1,1 +1,9 @@
-﻿
+﻿cl : command line  warning D9025: overriding '/sdl' with '/GS-'
+  Graphics.cpp
+  Bits.obj : MSIL .netmodule or module compiled with /GL found; restarting link with /LTCG; add /LTCG to the link command line to improve linker performance
+LINK : warning LNK4216: Exported entry point KernelMain
+     Creating library C:\Users\AJXS\Documents\VisualUefi\WinOS\x64\Release\WinOS-Kernel.lib and object C:\Users\AJXS\Documents\VisualUefi\WinOS\x64\Release\WinOS-Kernel.exp
+  Generating code
+  Finished generating code
+  WinOS-Kernel.vcxproj -> C:\Users\AJXS\Documents\VisualUefi\WinOS\x64\Release\WinOS-Kernel.bin
+          1 file(s) copied.
