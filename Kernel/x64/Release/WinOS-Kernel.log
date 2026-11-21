@@ -1,8 +1,5 @@
 ﻿cl : command line  warning D9025: overriding '/sdl' with '/GS-'
   Graphics.cpp
-  main.cpp
-C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\main.cpp(119,34): warning C4018: '<': signed/unsigned mismatch
-C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\main.cpp(119,79): warning C4018: '<': signed/unsigned mismatch
   Bits.obj : MSIL .netmodule or module compiled with /GL found; restarting link with /LTCG; add /LTCG to the link command line to improve linker performance
 LINK : warning LNK4216: Exported entry point KernelMain
      Creating library C:\Users\AJXS\Documents\VisualUefi\WinOS\x64\Release\WinOS-Kernel.lib and object C:\Users\AJXS\Documents\VisualUefi\WinOS\x64\Release\WinOS-Kernel.exp

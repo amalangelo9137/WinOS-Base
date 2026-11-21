@@ -8,4 +8,6 @@ namespace WinOS::Graphics
 	bool Initialize(const BOOT_CONFIG* config);
 
 	const Framebuffer& GetFramebuffer();
+
+	bool WritePixel(uint32_t x, uint32_t y, Color color);
 }

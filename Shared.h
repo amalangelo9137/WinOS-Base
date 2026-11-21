@@ -40,14 +40,14 @@ typedef enum {
 	BitMask,
 	BltOnly,
 	FormatMax
-} BOOT_PIXEL_FORMAT; // straight from the efi definition, names edited
+} BOOT_PIXEL_FORMAT; // straight from the efi definition, names edited, Shared.h
 
 typedef struct {
 	uint32_t RMask;
 	uint32_t GMask;
 	uint32_t BMask;
 	uint32_t ResMask;
-} BOOT_PIXEL_BITMASK; // straight from the efi definition, names edited
+} BOOT_PIXEL_BITMASK; // straight from the efi definition, names edited, Shared.h
 
 typedef struct {
 	// base
