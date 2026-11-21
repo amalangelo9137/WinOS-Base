@@ -104,14 +104,14 @@ static void* LoadFileIntoRAM(EFI_FILE* Directory, CHAR16* Path, UINTN* LoadedSiz
 
 	if (EFI_ERROR(Status))
 	{
-		Print(L"[X] WinOS-EFI/main.c/LoadFileIntoRAM()> Failed to open file\n");
-		Print(L"    Path: %s\n", Path);
-		Print(L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"Failed to open file\n");
+		DEBUG_PRINT(ERROR, L"    Path: %s\n", Path);
+		DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
 		return NULL;
 	}
 
-	Print(L"[i] WinOS-EFI/main.c/LoadFileIntoRAM()> Opened file\n");
-	Print(L"    Path: %s\n", Path);
+	DEBUG_PRINT(INFO, L"Opened file\n");
+	DEBUG_PRINT(INFO, L"    Path: %s\n", Path);
 
 	//
 	// Allocate buffer for EFI_FILE_INFO
@@ -127,17 +127,17 @@ static void* LoadFileIntoRAM(EFI_FILE* Directory, CHAR16* Path, UINTN* LoadedSiz
 
 	if (EFI_ERROR(Status))
 	{
-		Print(L"[X] WinOS-EFI/main.c/LoadFileIntoRAM()> Failed to allocate file info buffer\n");
-		Print(L"    Path: %s\n", Path);
-		Print(L"    Requested size: %u bytes\n", FileInfoSize);
-		Print(L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"Failed to allocate file info buffer\n");
+		DEBUG_PRINT(ERROR, L"    Path: %s\n", Path);
+		DEBUG_PRINT(ERROR, L"    Requested size: %u bytes\n", FileInfoSize);
+		DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
 
 		Status = LoadedFile->Close(LoadedFile);
 
 		if (EFI_ERROR(Status))
 		{
-			Print(L"[!] WinOS-EFI/main.c/LoadFileIntoRAM()> Failed to close file after error\n");
-			Print(L"    Status: %r\n", Status);
+			DEBUG_PRINT(WARN, L"Failed to close file after error\n");
+			DEBUG_PRINT(WARN, L"    Status: %r\n", Status);
 		}
 
 		return NULL;
@@ -155,25 +155,25 @@ static void* LoadFileIntoRAM(EFI_FILE* Directory, CHAR16* Path, UINTN* LoadedSiz
 
 	if (EFI_ERROR(Status))
 	{
-		Print(L"[X] WinOS-EFI/main.c/LoadFileIntoRAM()> Failed to get file information\n");
-		Print(L"    Path: %s\n", Path);
-		Print(L"    File info buffer size: %u bytes\n", FileInfoSize);
-		Print(L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"Failed to get file information\n");
+		DEBUG_PRINT(ERROR, L"    Path: %s\n", Path);
+		DEBUG_PRINT(ERROR, L"    File info buffer size: %u bytes\n", FileInfoSize);
+		DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
 
 		Status = LoadedFile->Close(LoadedFile);
 
 		if (EFI_ERROR(Status))
 		{
-			Print(L"[!] WinOS-EFI/main.c/LoadFileIntoRAM()> Failed to close file after error\n");
-			Print(L"    Status: %r\n", Status);
+			DEBUG_PRINT(WARN, L"Failed to close file after error\n");
+			DEBUG_PRINT(WARN, L"    Status: %r\n", Status);
 		}
 
 		Status = gBS->FreePool(FileInfo);
 
 		if (EFI_ERROR(Status))
 		{
-			Print(L"[!] WinOS-EFI/main.c/LoadFileIntoRAM()> Failed to free file info buffer\n");
-			Print(L"    Status: %r\n", Status);
+			DEBUG_PRINT(WARN, L"Failed to free file info buffer\n");
+			DEBUG_PRINT(WARN, L"    Status: %r\n", Status);
 		}
 
 		return NULL;
@@ -188,39 +188,39 @@ static void* LoadFileIntoRAM(EFI_FILE* Directory, CHAR16* Path, UINTN* LoadedSiz
 
 	if (EFI_ERROR(Status))
 	{
-		Print(L"[!] WinOS-EFI/main.c/LoadFileIntoRAM()> Failed to free file info buffer\n");
-		Print(L"    Path: %s\n", Path);
-		Print(L"    Status: %r\n", Status);
+		DEBUG_PRINT(WARN, L"Failed to free file info buffer\n");
+		DEBUG_PRINT(WARN, L"    Path: %s\n", Path);
+		DEBUG_PRINT(WARN, L"    Status: %r\n", Status);
 
 		Status = LoadedFile->Close(LoadedFile);
 
 		if (EFI_ERROR(Status))
 		{
-			Print(L"[!] WinOS-EFI/main.c/LoadFileIntoRAM()> Failed to close file\n");
-			Print(L"    Status: %r\n", Status);
+			DEBUG_PRINT(WARN, L"Failed to close file\n");
+			DEBUG_PRINT(WARN, L"    Status: %r\n", Status);
 		}
 
 		return NULL;
 	}
 
-	Print(L"[i] WinOS-EFI/main.c/LoadFileIntoRAM()> File information retrieved\n");
-	Print(L"    Path: %s\n", Path);
-	Print(L"    File size: %u bytes\n", FileSize);
+	DEBUG_PRINT(INFO, L"File information retrieved\n");
+	DEBUG_PRINT(INFO, L"    Path: %s\n", Path);
+	DEBUG_PRINT(INFO, L"    File size: %u bytes\n", FileSize);
 
 	//
 	// Empty files are not useful to the caller.
 	//
 	if (FileSize == 0)
 	{
-		Print(L"[!] WinOS-EFI/main.c/LoadFileIntoRAM()> File is empty\n");
-		Print(L"    Path: %s\n", Path);
+		DEBUG_PRINT(WARN, L"File is empty\n");
+		DEBUG_PRINT(WARN, L"    Path: %s\n", Path);
 
 		Status = LoadedFile->Close(LoadedFile);
 
 		if (EFI_ERROR(Status))
 		{
-			Print(L"[!] WinOS-EFI/main.c/LoadFileIntoRAM()> Failed to close empty file\n");
-			Print(L"    Status: %r\n", Status);
+			DEBUG_PRINT(WARN, L"Failed to close empty file\n");
+			DEBUG_PRINT(WARN, L"    Status: %r\n", Status);
 		}
 
 		return NULL;
@@ -231,10 +231,10 @@ static void* LoadFileIntoRAM(EFI_FILE* Directory, CHAR16* Path, UINTN* LoadedSiz
 	//
 	UINTN NumPages = (FileSize + 4095) / 4096;
 
-	Print(L"[i] WinOS-EFI/main.c/LoadFileIntoRAM()> Calculated memory requirements\n");
-	Print(L"    File size: %u bytes\n", FileSize);
-	Print(L"    Page size: 4096 bytes\n");
-	Print(L"    Pages required: %u\n", NumPages);
+	DEBUG_PRINT(INFO, L"Calculated memory requirements\n");
+	DEBUG_PRINT(INFO, L"    File size: %u bytes\n", FileSize);
+	DEBUG_PRINT(INFO, L"    Page size: 4096 bytes\n");
+	DEBUG_PRINT(INFO, L"    Pages required: %u\n", NumPages);
 
 	//
 	// Allocate pages for file contents.
@@ -250,18 +250,18 @@ static void* LoadFileIntoRAM(EFI_FILE* Directory, CHAR16* Path, UINTN* LoadedSiz
 
 	if (EFI_ERROR(Status))
 	{
-		Print(L"[X] WinOS-EFI/main.c/LoadFileIntoRAM()> Failed to allocate file pages\n");
-		Print(L"    Path: %s\n", Path);
-		Print(L"    File size: %u bytes\n", FileSize);
-		Print(L"    Pages requested: %u\n", NumPages);
-		Print(L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"Failed to allocate file pages\n");
+		DEBUG_PRINT(ERROR, L"    Path: %s\n", Path);
+		DEBUG_PRINT(ERROR, L"    File size: %u bytes\n", FileSize);
+		DEBUG_PRINT(ERROR, L"    Pages requested: %u\n", NumPages);
+		DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
 
 		Status = LoadedFile->Close(LoadedFile);
 
 		if (EFI_ERROR(Status))
 		{
-			Print(L"[!] LoadFileIntoRAM: Failed to close file after error\n");
-			Print(L"    Status: %r\n", Status);
+			DEBUG_PRINT(WARN, L"[!] LoadFileIntoRAM: Failed to close file after error\n");
+			DEBUG_PRINT(WARN, L"    Status: %r\n", Status);
 		}
 
 		return NULL;
@@ -269,10 +269,10 @@ static void* LoadFileIntoRAM(EFI_FILE* Directory, CHAR16* Path, UINTN* LoadedSiz
 
 	void* FileBuffer = (void*)FileBufferAddr;
 
-	Print(L"[i] WinOS-EFI/main.c/LoadFileIntoRAM()> Allocated file buffer\n");
-	Print(L"    Address: %p\n", FileBuffer);
-	Print(L"    Pages: %u\n", NumPages);
-	Print(L"    Capacity: %u bytes\n", NumPages * 4096);
+	DEBUG_PRINT(INFO, L"Allocated file buffer\n");
+	DEBUG_PRINT(INFO, L"    Address: %p\n", FileBuffer);
+	DEBUG_PRINT(INFO, L"    Pages: %u\n", NumPages);
+	DEBUG_PRINT(INFO, L"    Capacity: %u bytes\n", NumPages * 4096);
 
 	//
 	// Preserve the requested size because Read() modifies FileSize.
@@ -346,11 +346,11 @@ static void* LoadFileIntoRAM(EFI_FILE* Directory, CHAR16* Path, UINTN* LoadedSiz
 
 	if (LoadedSize != NULL)
 	{
-		Print(L"	LoadedSize output: %u\n", *LoadedSize);
+		DEBUG_PRINT(INFO, L"	LoadedSize output: %u\n", *LoadedSize);
 	}
 	else
 	{
-		Print(L"	LoadedSize output: NULL\n");
+		DEBUG_PRINT(INFO, L"	LoadedSize output: NULL\n");
 	}
 
 	return FileBuffer;
@@ -474,7 +474,7 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	gST->ConOut->ClearScreen(gST->ConOut);
 
-	Print(L"==> WinOS UEFI Loader v1.4 Patch 1 (Debug Edition) <==\n");
+	DEBUG_PRINT(INFO, L"==> WinOS UEFI Loader v1.4 Patch 1 (Debug Edition) <==\n");
 
 	//
 	// ------------------------------------------------------------
@@ -492,21 +492,21 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (EFI_ERROR(Status))
 	{
-		Print(L"[X] WinOS-EFI/main.c/UefiMain()> Failed to locate Graphics Output Protocol\n");
-		Print(L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"Failed to locate Graphics Output Protocol\n");
+		DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
 
 		while (TRUE)
 			__halt();
 	}
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> GOP located\n");
-	Print(L"    GOP: %p\n", GOP);
-	Print(L"    FrameBuffer: %p\n",
+	DEBUG_PRINT(INFO, L"GOP located\n");
+	DEBUG_PRINT(INFO, L"    GOP: %p\n", GOP);
+	DEBUG_PRINT(INFO, L"    FrameBuffer: %p\n",
 		(void*)GOP->Mode->FrameBufferBase);
-	Print(L"    Resolution: %u x %u\n",
+	DEBUG_PRINT(INFO, L"    Resolution: %u x %u\n",
 		GOP->Mode->Info->HorizontalResolution,
 		GOP->Mode->Info->VerticalResolution);
-	Print(L"    PixelsPerScanLine: %u\n",
+	DEBUG_PRINT(INFO, L"    PixelsPerScanLine: %u\n",
 		GOP->Mode->Info->PixelsPerScanLine);
 
 	//
@@ -525,17 +525,17 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (EFI_ERROR(Status))
 	{
-		Print(L"[X] WinOS-EFI/main.c/UefiMain()> Failed to get Loaded Image Protocol\n");
-		Print(L"    ImageHandle: %p\n", ImageHandle);
-		Print(L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"Failed to get Loaded Image Protocol\n");
+		DEBUG_PRINT(ERROR, L"    ImageHandle: %p\n", ImageHandle);
+		DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
 
 		while (TRUE)
 			__halt();
 	}
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Loaded Image Protocol located\n");
-	Print(L"    LoadedImage: %p\n", LoadedImage);
-	Print(L"    DeviceHandle: %p\n", LoadedImage->DeviceHandle);
+	DEBUG_PRINT(INFO, L"Loaded Image Protocol located\n");
+	DEBUG_PRINT(INFO, L"    LoadedImage: %p\n", LoadedImage);
+	DEBUG_PRINT(INFO, L"    DeviceHandle: %p\n", LoadedImage->DeviceHandle);
 
 	//
 	// ------------------------------------------------------------
@@ -553,16 +553,16 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (EFI_ERROR(Status))
 	{
-		Print(L"[X] WinOS-EFI/main.c/UefiMain()> Failed to get Simple File System Protocol\n");
-		Print(L"    DeviceHandle: %p\n", LoadedImage->DeviceHandle);
-		Print(L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"Failed to get Simple File System Protocol\n");
+		DEBUG_PRINT(ERROR, L"    DeviceHandle: %p\n", LoadedImage->DeviceHandle);
+		DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
 
 		while (TRUE)
 			__halt();
 	}
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Simple File System Protocol located\n");
-	Print(L"    FileSystem: %p\n", FileSystem);
+	DEBUG_PRINT(INFO, L"Simple File System Protocol located\n");
+	DEBUG_PRINT(INFO, L"    FileSystem: %p\n", FileSystem);
 
 	//
 	// ------------------------------------------------------------
@@ -579,16 +579,16 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (EFI_ERROR(Status))
 	{
-		Print(L"[X] WinOS-EFI/main.c/UefiMain()> Failed to open filesystem volume\n");
-		Print(L"    FileSystem: %p\n", FileSystem);
-		Print(L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"Failed to open filesystem volume\n");
+		DEBUG_PRINT(ERROR, L"    FileSystem: %p\n", FileSystem);
+		DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
 
 		while (TRUE)
 			__halt();
 	}
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Filesystem volume opened\n");
-	Print(L"    RootDir: %p\n", RootDir);
+	DEBUG_PRINT(INFO, L"Filesystem volume opened\n");
+	DEBUG_PRINT(INFO, L"    RootDir: %p\n", RootDir);
 
 	//
 	// ------------------------------------------------------------
@@ -603,10 +603,10 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (EFI_ERROR(Status))
 	{
-		Print(L"[i] WinOS-EFI/main.c/UefiMain()> Failed to reset root directory position\n");
-		Print(L"    RootDir: %p\n", RootDir);
-		Print(L"    Position: 0\n");
-		Print(L"    Status: %r\n", Status);
+		DEBUG_PRINT(INFO, L"Failed to reset root directory position\n");
+		DEBUG_PRINT(INFO, L"    RootDir: %p\n", RootDir);
+		DEBUG_PRINT(INFO, L"    Position: 0\n");
+		DEBUG_PRINT(INFO, L"    Status: %r\n", Status);
 
 		RootDir->Close(RootDir);
 
@@ -614,7 +614,7 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 			__halt();
 	}
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Root directory position reset\n");
+	DEBUG_PRINT(INFO, L"Root directory position reset\n");
 
 	//
 	// ------------------------------------------------------------
@@ -622,8 +622,8 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	// ------------------------------------------------------------
 	//
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Loading index file\n");
-	Print(L"    Path: \\\\index.wfs\n");
+	DEBUG_PRINT(INFO, L"Loading index file\n");
+	DEBUG_PRINT(INFO, L"    Path: \\\\index.wfs\n");
 
 	void* IndexRaw = LoadFileIntoRAM(
 		RootDir,
@@ -637,13 +637,13 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	//
 	if (IndexRaw == NULL)
 	{
-		Print(L"[!] WinOS-EFI/main.c/UefiMain()> index.wfs was not loaded\n");
-		Print(L"    Continuing without indexed assets\n");
+		DEBUG_PRINT(WARN, L"index.wfs was not loaded\n");
+		DEBUG_PRINT(WARN, L"    Continuing without indexed assets\n");
 	}
 	else
 	{
-		Print(L"[i] WinOS-EFI/main.c/UefiMain()> index.wfs loaded\n");
-		Print(L"    Address: %p\n", IndexRaw);
+		DEBUG_PRINT(INFO, L"index.wfs loaded\n");
+		DEBUG_PRINT(INFO, L"    Address: %p\n", IndexRaw);
 	}
 
 	//
@@ -662,10 +662,10 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (EFI_ERROR(Status))
 	{
-		Print(L"[X] WinOS-EFI/main.c/UefiMain()> Failed to allocate ASSET_TABLE\n");
-		Print(L"    Requested size: %u bytes\n",
+		DEBUG_PRINT(ERROR, L"Failed to allocate ASSET_TABLE\n");
+		DEBUG_PRINT(ERROR, L"    Requested size: %u bytes\n",
 			sizeof(ASSET_TABLE));
-		Print(L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
 
 		if (IndexRaw != NULL)
 		{
@@ -684,9 +684,9 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 			__halt();
 	}
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> ASSET_TABLE allocated\n");
-	Print(L"    Address: %p\n", Table);
-	Print(L"    Size: %u bytes\n", sizeof(ASSET_TABLE));
+	DEBUG_PRINT(INFO, L"ASSET_TABLE allocated\n");
+	DEBUG_PRINT(INFO, L"    Address: %p\n", Table);
+	DEBUG_PRINT(INFO, L"    Size: %u bytes\n", sizeof(ASSET_TABLE));
 
 	//
 	// ------------------------------------------------------------
@@ -706,10 +706,10 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (EFI_ERROR(Status))
 	{
-		Print(L"[X] WinOS-EFI/main.c/UefiMain()> Failed to allocate asset entries\n");
-		Print(L"    Maximum entries: %u\n", MaxAssetEntries);
-		Print(L"    Requested size: %u bytes\n", AssetEntriesSize);
-		Print(L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"Failed to allocate asset entries\n");
+		DEBUG_PRINT(ERROR, L"    Maximum entries: %u\n", MaxAssetEntries);
+		DEBUG_PRINT(ERROR, L"    Requested size: %u bytes\n", AssetEntriesSize);
+		DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
 
 		gBS->FreePool(Table);
 		RootDir->Close(RootDir);
@@ -720,10 +720,10 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	Table->Count = 0;
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Asset entries allocated\n");
-	Print(L"    Address: %p\n", Table->Entries);
-	Print(L"    Maximum entries: %u\n", MaxAssetEntries);
-	Print(L"    Buffer size: %u bytes\n", AssetEntriesSize);
+	DEBUG_PRINT(INFO, L"Asset entries allocated\n");
+	DEBUG_PRINT(INFO, L"    Address: %p\n", Table->Entries);
+	DEBUG_PRINT(INFO, L"    Maximum entries: %u\n", MaxAssetEntries);
+	DEBUG_PRINT(INFO, L"    Buffer size: %u bytes\n", AssetEntriesSize);
 
 	//
 	// ------------------------------------------------------------
@@ -731,7 +731,7 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	// ------------------------------------------------------------
 	//
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Parsing asset index...\n");
+	DEBUG_PRINT(INFO, L"Parsing asset index...\n");
 
 	CheckIndexFile(
 		IndexRaw,
@@ -739,8 +739,8 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 		RootDir
 	);
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Asset index processing complete\n");
-	Print(L"    Asset count: %u\n", Table->Count);
+	DEBUG_PRINT(INFO, L"Asset index processing complete\n");
+	DEBUG_PRINT(INFO, L"    Asset count: %u\n", Table->Count);
 
 	//
 	// ------------------------------------------------------------
@@ -748,20 +748,20 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	// ------------------------------------------------------------
 	//
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Building BootConfig...\n");
+	DEBUG_PRINT(INFO, L"Building BootConfig...\n");
 
 	BuildBootConfig(
 		Table,
 		GOP
 	);
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> BootConfig ready\n");
-	Print(L"    Assets: %p\n", BootConfig.Assets);
-	Print(L"    FrameBuffer: %p\n", BootConfig.GOPExports.FBAddress);
-	Print(L"    Resolution: %u x %u\n",
+	DEBUG_PRINT(INFO, L"BootConfig ready\n");
+	DEBUG_PRINT(INFO, L"    Assets: %p\n", BootConfig.Assets);
+	DEBUG_PRINT(INFO, L"    FrameBuffer: %p\n", BootConfig.GOPExports.FBAddress);
+	DEBUG_PRINT(INFO, L"    Resolution: %u x %u\n",
 		BootConfig.GOPExports.HorizontalResolution,
 		BootConfig.GOPExports.VerticalResolution);
-	Print(L"    PixelsPerScanLine: %u\n",
+	DEBUG_PRINT(INFO, L"    PixelsPerScanLine: %u\n",
 		BootConfig.GOPExports.PixelsPerScanLine);
 
 	//
@@ -770,8 +770,8 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	// ------------------------------------------------------------
 	//
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Loading font\n");
-	Print(L"    Path: \\font.psf\n");
+	DEBUG_PRINT(INFO, L"Loading font\n");
+	DEBUG_PRINT(INFO, L"    Path: \\font.psf\n");
 
 	void* FontFileBuffer = LoadFileIntoRAM(
 		RootDir,
@@ -781,8 +781,8 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (FontFileBuffer == NULL)
 	{
-		Print(L"[i] WinOS-EFI/main.c/UefiMain()> Failed to load font\n");
-		Print(L"    Path: \\font.psf\n");
+		DEBUG_PRINT(INFO, L"Failed to load font\n");
+		DEBUG_PRINT(INFO, L"    Path: \\font.psf\n");
 
 		RootDir->Close(RootDir);
 
@@ -791,9 +791,9 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	BootConfig.Font = (PSF1_HEADER*)FontFileBuffer;
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Font loaded\n");
-	Print(L"    Address: %p\n", FontFileBuffer);
-	Print(L"    BootConfig.Font: %p\n",
+	DEBUG_PRINT(INFO, L"Font loaded\n");
+	DEBUG_PRINT(INFO, L"    Address: %p\n", FontFileBuffer);
+	DEBUG_PRINT(INFO, L"    BootConfig.Font: %p\n",
 		BootConfig.Font);
 
 	//
@@ -802,8 +802,8 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	// ------------------------------------------------------------
 	//
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Loading kernel\n");
-	Print(L"    Path: \\KERNEL\n");
+	DEBUG_PRINT(INFO, L"Loading kernel\n");
+	DEBUG_PRINT(INFO, L"    Path: \\KERNEL\n");
 
 	UINTN KernelFileSize = 0;
 
@@ -815,8 +815,8 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (KernelRaw == NULL)
 	{
-		Print(L"[X] WinOS-EFI/main.c/UefiMain()> Failed to load kernel\n");
-		Print(L"    Path: \\KERNEL\n");
+		DEBUG_PRINT(ERROR, L"Failed to load kernel\n");
+		DEBUG_PRINT(ERROR, L"    Path: \\KERNEL\n");
 
 		RootDir->Close(RootDir);
 
@@ -824,9 +824,9 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 			__halt();
 	}
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Kernel loaded\n");
-	Print(L"    Address: %p\n", KernelRaw);
-	Print(L"    Size: %u bytes\n", KernelFileSize);
+	DEBUG_PRINT(INFO, L"Kernel loaded\n");
+	DEBUG_PRINT(INFO, L"    Address: %p\n", KernelRaw);
+	DEBUG_PRINT(INFO, L"    Size: %u bytes\n", KernelFileSize);
 
 	//
 	// ------------------------------------------------------------
@@ -836,9 +836,9 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (KernelFileSize < sizeof(EFI_IMAGE_DOS_HEADER))
 	{
-		Print(L"[X] WinOS-EFI/main.c/UefiMain()> Kernel is too small for a DOS header\n");
-		Print(L"    Kernel size: %u bytes\n", KernelFileSize);
-		Print(L"    Required: %u bytes\n",
+		DEBUG_PRINT(ERROR, L"Kernel is too small for a DOS header\n");
+		DEBUG_PRINT(ERROR, L"    Kernel size: %u bytes\n", KernelFileSize);
+		DEBUG_PRINT(ERROR, L"    Required: %u bytes\n",
 			sizeof(EFI_IMAGE_DOS_HEADER));
 
 		while (TRUE)
@@ -848,16 +848,16 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	EFI_IMAGE_DOS_HEADER* DOSHeader =
 		(EFI_IMAGE_DOS_HEADER*)KernelRaw;
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Checking DOS header\n");
-	Print(L"    e_magic: 0x%x\n", DOSHeader->e_magic);
-	Print(L"    e_lfanew: %u\n", DOSHeader->e_lfanew);
+	DEBUG_PRINT(INFO, L"Checking DOS header\n");
+	DEBUG_PRINT(INFO, L"    e_magic: 0x%x\n", DOSHeader->e_magic);
+	DEBUG_PRINT(INFO, L"    e_lfanew: %u\n", DOSHeader->e_lfanew);
 
 	if (DOSHeader->e_magic != EFI_IMAGE_DOS_SIGNATURE)
 	{
-		Print(L"[X] WinOS-EFI/main.c/UefiMain()> Invalid DOS header signature\n");
-		Print(L"    Expected: 0x%x\n",
+		DEBUG_PRINT(ERROR, L"Invalid DOS header signature\n");
+		DEBUG_PRINT(ERROR, L"    Expected: 0x%x\n",
 			EFI_IMAGE_DOS_SIGNATURE);
-		Print(L"    Received: 0x%x\n",
+		DEBUG_PRINT(ERROR, L"    Received: 0x%x\n",
 			DOSHeader->e_magic);
 
 		while (TRUE)
@@ -872,8 +872,8 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (DOSHeader->e_lfanew < 0)
 	{
-		Print(L"[X] WinOS-EFI/main.c/UefiMain()> Invalid negative e_lfanew\n");
-		Print(L"    e_lfanew: %d\n", DOSHeader->e_lfanew);
+		DEBUG_PRINT(ERROR, L"Invalid negative e_lfanew\n");
+		DEBUG_PRINT(ERROR, L"    e_lfanew: %d\n", DOSHeader->e_lfanew);
 
 		while (TRUE)
 			__halt();
@@ -885,10 +885,10 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	if (NTHeaderOffset >
 		KernelFileSize - sizeof(EFI_IMAGE_NT_HEADERS64))
 	{
-		Print(L"[X] WinOS-EFI/main.c/UefiMain()> NT header exceeds kernel file bounds\n");
-		Print(L"    Kernel size: %u bytes\n", KernelFileSize);
-		Print(L"    NT header offset: %u\n", NTHeaderOffset);
-		Print(L"    NT header size: %u bytes\n",
+		DEBUG_PRINT(ERROR, L"NT header exceeds kernel file bounds\n");
+		DEBUG_PRINT(ERROR, L"    Kernel size: %u bytes\n", KernelFileSize);
+		DEBUG_PRINT(ERROR, L"    NT header offset: %u\n", NTHeaderOffset);
+		DEBUG_PRINT(ERROR, L"    NT header size: %u bytes\n",
 			sizeof(EFI_IMAGE_NT_HEADERS64));
 
 		while (TRUE)
@@ -899,10 +899,10 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 		(EFI_IMAGE_NT_HEADERS64*)
 		((UINT8*)KernelRaw + NTHeaderOffset);
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> NT header located\n");
-	Print(L"    Address: %p\n", NTHeaders);
-	Print(L"    Offset: %u\n", NTHeaderOffset);
-	Print(L"    Signature: 0x%x\n", NTHeaders->Signature);
+	DEBUG_PRINT(INFO, L"NT header located\n");
+	DEBUG_PRINT(INFO, L"    Address: %p\n", NTHeaders);
+	DEBUG_PRINT(INFO, L"    Offset: %u\n", NTHeaderOffset);
+	DEBUG_PRINT(INFO, L"    Signature: 0x%x\n", NTHeaders->Signature);
 
 	//
 	// ------------------------------------------------------------
@@ -912,17 +912,17 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (NTHeaders->Signature != EFI_IMAGE_NT_SIGNATURE)
 	{
-		Print(L"[X] WinOS-EFI/main.c/UefiMain()> Invalid NT header signature\n");
-		Print(L"    Expected: 0x%x\n",
+		DEBUG_PRINT(ERROR, L"Invalid NT header signature\n");
+		DEBUG_PRINT(ERROR, L"    Expected: 0x%x\n",
 			EFI_IMAGE_NT_SIGNATURE);
-		Print(L"    Received: 0x%x\n",
+		DEBUG_PRINT(ERROR, L"    Received: 0x%x\n",
 			NTHeaders->Signature);
 
 		while (TRUE)
 			__halt();
 	}
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> PE headers look valid\n");
+	DEBUG_PRINT(INFO, L"PE headers look valid\n");
 
 	//
 	// ------------------------------------------------------------
@@ -945,16 +945,16 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	UINTN EntryPointOffset =
 		NTHeaders->OptionalHeader.AddressOfEntryPoint;
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Kernel memory requirements\n");
-	Print(L"    Preferred ImageBase: %p\n",
+	DEBUG_PRINT(INFO, L"Kernel memory requirements\n");
+	DEBUG_PRINT(INFO, L"    Preferred ImageBase: %p\n",
 		(void*)KernelBase);
-	Print(L"    SizeOfImage: %u bytes\n",
+	DEBUG_PRINT(INFO, L"    SizeOfImage: %u bytes\n",
 		KernelImageSize);
-	Print(L"    Pages required: %u\n",
+	DEBUG_PRINT(INFO, L"    Pages required: %u\n",
 		KernelPages);
-	Print(L"    Sections: %u\n",
+	DEBUG_PRINT(INFO, L"    Sections: %u\n",
 		NumberOfSections);
-	Print(L"    EntryPoint RVA: 0x%x\n",
+	DEBUG_PRINT(INFO, L"    EntryPoint RVA: 0x%x\n",
 		EntryPointOffset);
 
 	//
@@ -972,11 +972,11 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (EFI_ERROR(Status))
 	{
-		Print(L"[!] WinOS-EFI/main.c/UefiMain()> Preferred kernel address unavailable\n");
-		Print(L"    Preferred address: %p\n",
+		DEBUG_PRINT(WARN, L"Preferred kernel address unavailable\n");
+		DEBUG_PRINT(WARN, L"    Preferred address: %p\n",
 			(void*)NTHeaders->OptionalHeader.ImageBase);
-		Print(L"    Pages requested: %u\n", KernelPages);
-		Print(L"    Status: %r\n", Status);
+		DEBUG_PRINT(WARN, L"    Pages requested: %u\n", KernelPages);
+		DEBUG_PRINT(WARN, L"    Status: %r\n", Status);
 
 		//
 		// Retry anywhere.
@@ -993,23 +993,23 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 		if (EFI_ERROR(Status))
 		{
-			Print(L"[X] WinOS-EFI/main.c/UefiMain()> Failed to allocate kernel memory\n");
-			Print(L"    Pages requested: %u\n", KernelPages);
-			Print(L"    Status: %r\n", Status);
+			DEBUG_PRINT(ERROR, L"Failed to allocate kernel memory\n");
+			DEBUG_PRINT(ERROR, L"    Pages requested: %u\n", KernelPages);
+			DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
 
 			while (TRUE)
 				__halt();
 		}
 
-		Print(L"[i] WinOS-EFI/main.c/UefiMain()> Kernel allocated at fallback address\n");
+		DEBUG_PRINT(INFO, L"Kernel allocated at fallback address\n");
 	}
 	else
 	{
-		Print(L"[i] WinOS-EFI/main.c/UefiMain()> Kernel allocated at preferred address\n");
+		DEBUG_PRINT(INFO, L"Kernel allocated at preferred address\n");
 	}
 
-	Print(L"    KernelBase: %p\n", (void*)KernelBase);
-	Print(L"    Pages: %u\n", KernelPages);
+	DEBUG_PRINT(INFO, L"    KernelBase: %p\n", (void*)KernelBase);
+	DEBUG_PRINT(INFO, L"    Pages: %u\n", KernelPages);
 
 	//
 	// ------------------------------------------------------------
@@ -1022,16 +1022,16 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 		((UINT8*)NTHeaders +
 			sizeof(EFI_IMAGE_NT_HEADERS64));
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Copying kernel sections\n");
+	DEBUG_PRINT(INFO, L"Copying kernel sections\n");
 
 	for (UINTN i = 0; i < NumberOfSections; i++)
 	{
-		Print(L"    Section %u\n", i);
-		Print(L"        VirtualAddress: 0x%x\n",
+		DEBUG_PRINT(INFO, L"    Section %u\n", i);
+		DEBUG_PRINT(INFO, L"        VirtualAddress: 0x%x\n",
 			Section[i].VirtualAddress);
-		Print(L"        RawOffset: 0x%x\n",
+		DEBUG_PRINT(INFO, L"        RawOffset: 0x%x\n",
 			Section[i].PointerToRawData);
-		Print(L"        RawSize: %u bytes\n",
+		DEBUG_PRINT(INFO, L"        RawSize: %u bytes\n",
 			Section[i].SizeOfRawData);
 
 		gBS->CopyMem(
@@ -1045,7 +1045,7 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 		);
 	}
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Kernel sections copied\n");
+	DEBUG_PRINT(INFO, L"Kernel sections copied\n");
 
 	//
 	// ------------------------------------------------------------
@@ -1060,11 +1060,11 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 		(KernelBase +
 			NTHeaders->OptionalHeader.AddressOfEntryPoint);
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Kernel entry point prepared\n");
-	Print(L"    KernelBase: %p\n", (void*)KernelBase);
-	Print(L"    EntryPoint RVA: 0x%x\n",
+	DEBUG_PRINT(INFO, L"Kernel entry point prepared\n");
+	DEBUG_PRINT(INFO, L"    KernelBase: %p\n", (void*)KernelBase);
+	DEBUG_PRINT(INFO, L"    EntryPoint RVA: 0x%x\n",
 		NTHeaders->OptionalHeader.AddressOfEntryPoint);
-	Print(L"    KernelStart: %p\n",
+	DEBUG_PRINT(INFO, L"    KernelStart: %p\n",
 		(void*)KernelStart);
 
 	//
@@ -1079,7 +1079,7 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	UINT32 DVer = 0;
 	EFI_MEMORY_DESCRIPTOR* MMap = NULL;
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Querying memory map size\n");
+	DEBUG_PRINT(INFO, L"Querying memory map size\n");
 
 	Status = gBS->GetMemoryMap(
 		&MMapSize,
@@ -1094,19 +1094,19 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	//
 	if (Status != EFI_BUFFER_TOO_SMALL)
 	{
-		Print(L"[X] WinOS-EFI/main.c/UefiMain()> Initial GetMemoryMap() failed unexpectedly\n");
-		Print(L"    Status: %r\n", Status);
-		Print(L"    Reported size: %u\n", MMapSize);
-		Print(L"    Descriptor size: %u\n", DSize);
+		DEBUG_PRINT(ERROR, L"Initial GetMemoryMap() failed unexpectedly\n");
+		DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"    Reported size: %u\n", MMapSize);
+		DEBUG_PRINT(ERROR, L"    Descriptor size: %u\n", DSize);
 
 		while (TRUE)
 			__halt();
 	}
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Memory map size obtained\n");
-	Print(L"    Required size: %u bytes\n", MMapSize);
-	Print(L"    Descriptor size: %u bytes\n", DSize);
-	Print(L"    Descriptor version: 0x%x\n", DVer);
+	DEBUG_PRINT(INFO, L"Memory map size obtained\n");
+	DEBUG_PRINT(INFO, L"    Required size: %u bytes\n", MMapSize);
+	DEBUG_PRINT(INFO, L"    Descriptor size: %u bytes\n", DSize);
+	DEBUG_PRINT(INFO, L"    Descriptor version: 0x%x\n", DVer);
 
 	//
 	// ------------------------------------------------------------
@@ -1118,9 +1118,9 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	MMapSize += MMapSafetyBuffer;
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Allocating memory map buffer\n");
-	Print(L"    Buffer size: %u bytes\n", MMapSize);
-	Print(L"    Safety buffer: %u bytes\n",
+	DEBUG_PRINT(INFO, L"Allocating memory map buffer\n");
+	DEBUG_PRINT(INFO, L"    Buffer size: %u bytes\n", MMapSize);
+	DEBUG_PRINT(INFO, L"    Safety buffer: %u bytes\n",
 		MMapSafetyBuffer);
 
 	Status = gBS->AllocatePool(
@@ -1131,17 +1131,17 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (EFI_ERROR(Status))
 	{
-		Print(L"[X] WinOS-EFI/main.c/UefiMain()> Failed to allocate memory map buffer\n");
-		Print(L"    Requested size: %u bytes\n", MMapSize);
-		Print(L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"Failed to allocate memory map buffer\n");
+		DEBUG_PRINT(ERROR, L"    Requested size: %u bytes\n", MMapSize);
+		DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
 
 		while (TRUE)
 			__halt();
 	}
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Memory map buffer allocated\n");
-	Print(L"    Address: %p\n", MMap);
-	Print(L"    Capacity: %u bytes\n", MMapSize);
+	DEBUG_PRINT(INFO, L"Memory map buffer allocated\n");
+	DEBUG_PRINT(INFO, L"    Address: %p\n", MMap);
+	DEBUG_PRINT(INFO, L"    Capacity: %u bytes\n", MMapSize);
 
 	//
 	// ------------------------------------------------------------
@@ -1159,10 +1159,10 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (EFI_ERROR(Status))
 	{
-		Print(L"[X] WinOS-EFI/main.c/UefiMain()> Failed to retrieve memory map\n");
-		Print(L"    Buffer: %p\n", MMap);
-		Print(L"    Buffer capacity: %u bytes\n", MMapSize);
-		Print(L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"Failed to retrieve memory map\n");
+		DEBUG_PRINT(ERROR, L"    Buffer: %p\n", MMap);
+		DEBUG_PRINT(ERROR, L"    Buffer capacity: %u bytes\n", MMapSize);
+		DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
 
 		gBS->FreePool(MMap);
 
@@ -1170,12 +1170,12 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 			__halt();
 	}
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Memory map retrieved\n");
-	Print(L"    Address: %p\n", MMap);
-	Print(L"    Used size: %u bytes\n", MMapSize);
-	Print(L"    Descriptor size: %u bytes\n", DSize);
-	Print(L"    Descriptor version: 0x%x\n", DVer);
-	Print(L"    Map key: %u\n", MMapKey);
+	DEBUG_PRINT(INFO, L"Memory map retrieved\n");
+	DEBUG_PRINT(INFO, L"    Address: %p\n", MMap);
+	DEBUG_PRINT(INFO, L"    Used size: %u bytes\n", MMapSize);
+	DEBUG_PRINT(INFO, L"    Descriptor size: %u bytes\n", DSize);
+	DEBUG_PRINT(INFO, L"    Descriptor version: 0x%x\n", DVer);
+	DEBUG_PRINT(INFO, L"    Map key: %u\n", MMapKey);
 
 	//
 	// ------------------------------------------------------------
@@ -1187,11 +1187,11 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	BootConfig.MemMapSize = (uint64_t)MMapSize;
 	BootConfig.MemMapDescriptorSize = (uint64_t)DSize;
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> BootConfig memory map configured\n");
-	Print(L"    MemMap: %p\n", BootConfig.MemMap);
-	Print(L"    MemMapSize: %llu\n",
+	DEBUG_PRINT(INFO, L"BootConfig memory map configured\n");
+	DEBUG_PRINT(INFO, L"    MemMap: %p\n", BootConfig.MemMap);
+	DEBUG_PRINT(INFO, L"    MemMapSize: %llu\n",
 		BootConfig.MemMapSize);
-	Print(L"    DescriptorSize: %llu\n",
+	DEBUG_PRINT(INFO, L"    DescriptorSize: %llu\n",
 		BootConfig.MemMapDescriptorSize);
 
 	//
@@ -1200,7 +1200,7 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 // ------------------------------------------------------------
 //
 
-	Print(L"[i] WinOS-EFI/main.c/UefiMain()> Preparing to exit Boot Services...\n");
+	DEBUG_PRINT(INFO, L"Preparing to exit Boot Services...\n");
 
 	//
 	// IMPORTANT:
@@ -1222,8 +1222,8 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 		// which normally means the memory-map key became stale.
 		//
 
-		Print(L"[!] WinOS-EFI/main.c/UefiMain()> First ExitBootServices() failed\n");
-		Print(L"    Status: %r\n", Status);
+		DEBUG_PRINT(WARN, L"First ExitBootServices() failed\n");
+		DEBUG_PRINT(WARN, L"    Status: %r\n", Status);
 
 		//
 		// Refresh the memory map.
@@ -1240,8 +1240,8 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 		if (Status != EFI_BUFFER_TOO_SMALL)
 		{
-			Print(L"[X] WinOS-EFI/main.c/UefiMain()> Failed to query refreshed memory map size\n");
-			Print(L"    Status: %r\n", Status);
+			DEBUG_PRINT(ERROR, L"Failed to query refreshed memory map size\n");
+			DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
 
 			while (TRUE)
 				__halt();
@@ -1252,9 +1252,9 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 		//
 		MMapSize = NewMMapSize + 4096;
 
-		Print(L"[i] WinOS-EFI/main.c/UefiMain()> Allocating refreshed memory map buffer\n");
-		Print(L"    Required size: %u bytes\n", NewMMapSize);
-		Print(L"    Buffer size: %u bytes\n", MMapSize);
+		DEBUG_PRINT(INFO, L"Allocating refreshed memory map buffer\n");
+		DEBUG_PRINT(INFO, L"    Required size: %u bytes\n", NewMMapSize);
+		DEBUG_PRINT(INFO, L"    Buffer size: %u bytes\n", MMapSize);
 
 		//
 		// We no longer need the old map buffer.
@@ -1263,8 +1263,8 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 		if (EFI_ERROR(Status))
 		{
-			Print(L"[X] WinOS-EFI/main.c/UefiMain()> Failed to free old memory map buffer\n");
-			Print(L"    Status: %r\n", Status);
+			DEBUG_PRINT(ERROR, L"Failed to free old memory map buffer\n");
+			DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
 
 			while (TRUE)
 				__halt();
@@ -1281,9 +1281,9 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 		if (EFI_ERROR(Status))
 		{
-			Print(L"[X] WinOS-EFI/main.c/UefiMain()> Failed to allocate refreshed memory map buffer\n");
-			Print(L"    Requested size: %u bytes\n", MMapSize);
-			Print(L"    Status: %r\n", Status);
+			DEBUG_PRINT(ERROR, L"Failed to allocate refreshed memory map buffer\n");
+			DEBUG_PRINT(ERROR, L"    Requested size: %u bytes\n", MMapSize);
+			DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
 
 			while (TRUE)
 				__halt();
@@ -1302,10 +1302,10 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 		if (EFI_ERROR(Status))
 		{
-			Print(L"[X] WinOS-EFI/main.c/UefiMain()> Failed to retrieve refreshed memory map\n");
-			Print(L"    Buffer: %p\n", MMap);
-			Print(L"    Buffer capacity: %u bytes\n", MMapSize);
-			Print(L"    Status: %r\n", Status);
+			DEBUG_PRINT(ERROR, L"Failed to retrieve refreshed memory map\n");
+			DEBUG_PRINT(ERROR, L"    Buffer: %p\n", MMap);
+			DEBUG_PRINT(ERROR, L"    Buffer capacity: %u bytes\n", MMapSize);
+			DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
 
 			while (TRUE)
 				__halt();
@@ -1320,7 +1320,7 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 		//
 		// IMPORTANT:
-		// Do not Print() here.
+		// Do not call DEBUG_PRINT() here.
 		//
 		// GetMemoryMap() gave us the current MapKey.
 		// ExitBootServices() must happen immediately.
@@ -1336,8 +1336,8 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 			// If this happens, the map changed again.
 			// We will deal with repeated retries properly later.
 			//
-			Print(L"[X] WinOS-EFI/main.c/UefiMain()> ExitBootServices() retry failed\n");
-			Print(L"    Status: %r\n", Status);
+			DEBUG_PRINT(ERROR, L"ExitBootServices() retry failed\n");
+			DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
 
 			while (TRUE)
 				__halt();
