@@ -449,7 +449,7 @@ void BuildBootConfig(ASSET_TABLE* Table, EFI_GRAPHICS_OUTPUT_PROTOCOL* GOP) {
 	BootConfig.Width = GOP->Mode->Info->HorizontalResolution;
 	BootConfig.Height = GOP->Mode->Info->VerticalResolution;
 	BootConfig.PixelsPerScanLine = GOP->Mode->Info->PixelsPerScanLine;
-	BootConfig.PixelFormat = GOP->Mode->Info->PixelFormat;
+	BootConfig.PixelFormat = (BOOT_PIXEL_FORMAT)GOP->Mode->Info->PixelFormat;
 	BootConfig.BackBuffer = AllocateBackBuffer();
 
 	Print(L"[i] WinOS-EFI/main.c/BuildBootConfig()> Successfully built BootConfig :D\n");

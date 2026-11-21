@@ -8,16 +8,16 @@ namespace WinOS::Graphics
 	{
 		// A pixel is 32 bits; Definition from the physical frame buffer
 		// byte 0 = red intensity, byte 1 = green intensity, byte 2 = blue intensity, byte 3 = reserved
-		PixelRedGreenBlueReserved8BitPerColor,
+		RGB8Bit,
 		// A pixel is 32 bits; Definition from the physical frame buffer
 		// byte 0 = blue intensity, byte 1 = green intensity, byte 2 = red intensity, byte 3 = reserved
-		PixelBlueGreenRedReserved8BitPerColor,
+		BGR8Bit,
 		// Pixel definition of the physical frame buffer.
-		PixelBitMask,
+		BitMask,
 		/// Physical frame buffer not supported.
-		PixelBltOnly,
+		BltOnly,
 		// Maximum allowed value
-		PixelFormatMax
+		FormatMax
 	};
 
 	// here we have the whole framebuffer shared to the editor gng :)

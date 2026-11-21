@@ -35,11 +35,11 @@ typedef struct {
 } PSF1_HEADER;
 
 typedef enum {
-	PixelRedGreenBlueReserved8BitPerColor,
-	PixelBlueGreenRedReserved8BitPerColor,
-	PixelBitMask,
-	PixelBltOnly,
-	PixelFormatMax
+	RGB8Bit,
+	BGR8BitPer,
+	BitMask,
+	BltOnly,
+	FormatMax
 } BOOT_PIXEL_FORMAT; // straight from the efi definition
 
 // The ultimate payload handed to the Kernel
