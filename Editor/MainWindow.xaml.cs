@@ -459,7 +459,7 @@ namespace WinOS_Editor
 
             closeButton.Click += (_, _) => CloseTab(tab);
 
-            editor.TextChanged += (_, _) =>
+            editor.Document.TextChanged += (_, _) =>
             {
                 document.Content = editor.Text;
                 document.IsModified = true;
