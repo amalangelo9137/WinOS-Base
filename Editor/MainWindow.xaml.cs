@@ -10,6 +10,7 @@ using System.Xml;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
+using ICSharpCode.AvalonEdit.Editing;
 using WinOS_Editor.toolchains;
 using WinOS_Editor.Analysis;
 using WinOS_Editor.Build;
@@ -446,7 +447,6 @@ namespace WinOS_Editor
                 Margin = new(24, 4, 4, 4),
                 Background = new SolidColorBrush(Color.FromRgb(30, 30, 30)),
                 Foreground = new SolidColorBrush(Color.FromRgb(212, 212, 212)),
-                LineNumbersForeground = new SolidColorBrush(Color.FromRgb(133, 133, 133)),
                 BorderBrush = SystemColors.AccentColorDark2Brush,
                 Cursor = Cursors.IBeam,
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
@@ -454,6 +454,15 @@ namespace WinOS_Editor
             };
 
             editor.SyntaxHighlighting = VisualStudioCppHighlighting;
+
+            SolidColorBrush lineNumberBrush =
+                new(Color.FromRgb(133, 133, 133));
+
+            foreach (LineNumberMargin margin in
+                     editor.TextArea.LeftMargins.OfType<LineNumberMargin>())
+            {
+                margin.Foreground = lineNumberBrush;
+            }
             editor.PreviewMouseWheel += (_, e) =>
             {
                 if ((Keyboard.Modifiers & ModifierKeys.Control) == 0)
