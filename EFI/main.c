@@ -1,8 +1,7 @@
 #define PROJ L"WinOS-EFI"
 #define FILE L"main.c"
 
-// my own implementation attempt of WinOS.
-// Welcome to WinOS (not WinOS-Dev)!
+// WinOS UEFI loader.
 #include <Guid/FileInfo.h>
 #include <IndustryStandard/PeImage.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -26,58 +25,11 @@
 extern CONST UINT32 _gUefiDriverRevision = 0;
 CHAR8* gEfiCallerBaseName = "WinOS";
 
-#define DEBUG_FILE L"main.c"
-
 #define INFO L"i"
 #define WARN L"!"
 #define ERROR L"X"
 
 BOOT_CONFIG BootConfig;
-
-static BOOLEAN EndsWithIgnoreCase(const char* value, const char* suffix) {
-	if (value == NULL || suffix == NULL) {
-		return FALSE;
-	}
-
-	UINTN valueLength = AsciiStrLen(value);
-	UINTN suffixLength = AsciiStrLen(suffix);
-	if (suffixLength > valueLength) {
-		return FALSE;
-	}
-
-	return AsciiStriCmp(value + (valueLength - suffixLength), suffix) == 0;
-}
-
-static UINT32 InferAssetTypeFromPath(const char* path) {
-	if (path == NULL) {
-		return AssetTypeUnknown;
-	}
-
-	if (EndsWithIgnoreCase(path, ".bmp")) return AssetTypeBitmap;
-	if (EndsWithIgnoreCase(path, ".gif")) return AssetTypeGif;
-	if (EndsWithIgnoreCase(path, ".wdexe")) return AssetTypeAppPackage;
-	if (EndsWithIgnoreCase(path, ".psf")) return AssetTypePsfFont;
-	return AssetTypeUnknown;
-}
-
-static UINT32 DetectAssetType(const void* buffer, UINTN size) {
-	if (buffer == NULL || size < 4) {
-		return AssetTypeUnknown;
-	}
-
-	const UINT8* bytes = (const UINT8*)buffer;
-	if (size >= 2 && bytes[0] == 'B' && bytes[1] == 'M') return AssetTypeBitmap;
-	if (size >= 4 && bytes[0] == 'W' && bytes[1] == 'D' && bytes[2] == 'X' && bytes[3] == 'E') return AssetTypeAppPackage;
-	if (size >= 3 && bytes[0] == 'G' && bytes[1] == 'I' && bytes[2] == 'F') return AssetTypeGif;
-	if (size >= sizeof(PSF1_HEADER)) {
-		const PSF1_HEADER* font = (const PSF1_HEADER*)buffer;
-		if (font->Magic[0] == 0x36 && font->Magic[1] == 0x04) {
-			return AssetTypePsfFont;
-		}
-	}
-
-	return AssetTypeUnknown;
-}
 
 /// <summary>
 /// Get a file from the loaded file system.
@@ -357,67 +309,10 @@ static void* LoadFileIntoRAM(EFI_FILE* Directory, CHAR16* Path, UINTN* LoadedSiz
 }
 
 /// <summary>
-/// Browses index.wfs to check for files and stuff. Derived straight from WinOS-Dev, and may be deprecated soon.
-/// </summary>
-/// <param name="IndexRaw">Raw Index</param>
-/// <param name="Table">Asset table</param>
-/// <param name="RootDir">Root directory</param>
-static void CheckIndexFile(void* IndexRaw, ASSET_TABLE* Table, EFI_FILE* RootDir)
-{
-	if (IndexRaw != NULL) {
-		char* IndexPtr = (char*)IndexRaw;
-		while (*IndexPtr != '\0' && Table->Count < 50) {
-			while (*IndexPtr == '\r' || *IndexPtr == '\n' || *IndexPtr == ' ') IndexPtr++;
-			if (*IndexPtr == '\0') break;
-
-			char* NameStart = IndexPtr;
-			while (*IndexPtr != ':' && *IndexPtr != '\0') IndexPtr++;
-			if (*IndexPtr == '\0') break;
-			*IndexPtr = '\0';
-			IndexPtr++;
-
-			char* PathStart = IndexPtr;
-			while (*IndexPtr != '\r' && *IndexPtr != '\n' && *IndexPtr != '\0') IndexPtr++;
-			if (*IndexPtr != '\0') { *IndexPtr = '\0'; IndexPtr++; }
-
-			CHAR16 UPath[128];
-			UPath[0] = L'\\';
-			int uIdx = 1, pIdx = 0;
-			while (PathStart[pIdx] == ' ' || PathStart[pIdx] == '\\') pIdx++;
-			while (PathStart[pIdx] != '\0' && uIdx < 127) {
-				UPath[uIdx++] = (CHAR16)PathStart[pIdx++];
-			}
-			UPath[uIdx] = L'\0';
-
-			UINTN AssetSize = 0;
-			void* AssetAddr = LoadFileIntoRAM(RootDir, UPath, &AssetSize);
-			if (AssetAddr) {
-				UINT32 expectedType = InferAssetTypeFromPath(PathStart);
-				UINT32 actualType = DetectAssetType(AssetAddr, AssetSize);
-				if (expectedType != AssetTypeUnknown &&
-					actualType != AssetTypeUnknown &&
-					expectedType != actualType) {
-					DEBUG_PRINT(WARN, L"Skipping mismatched asset type : % a\n", NameStart);
-					continue;
-				}
-
-				AsciiStrCpyS(Table->Entries[Table->Count].Name, 32, NameStart);
-				Table->Entries[Table->Count].Address = AssetAddr;
-				Table->Entries[Table->Count].Size = (UINT32)AssetSize;
-				Table->Entries[Table->Count].Type = actualType;
-				Table->Count++;
-			}
-		}
-	}
-}
-
-/// <summary>
 /// Build boot configurations (init).
 /// </summary>
-void BuildBootConfig(ASSET_TABLE* Table, EFI_GRAPHICS_OUTPUT_PROTOCOL* GOP) {
+void BuildBootConfig(EFI_GRAPHICS_OUTPUT_PROTOCOL* GOP) {
 	DEBUG_PRINT(INFO, L"Building BootConfig...");
-
-	BootConfig.Assets = Table;
 
 	BootConfig.GOPExports.FBAddress = GOP->Mode->FrameBufferBase;
 	DEBUG_PRINT(INFO, L"Framebuffer Address: 0x%lx", BootConfig.GOPExports.FBAddress);
@@ -575,120 +470,15 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	DEBUG_PRINT(INFO, L"Root directory position reset!\n");
 
-	// 6. Load index.wfs (temporary, will remove / edit later)
-	DEBUG_PRINT(INFO, L"Loading index file (WinOS-Dev Derivative) @ \\\\index.wfs...");
-
-	void* IndexRaw = LoadFileIntoRAM(
-		RootDir,
-		L"\\index.wfs",
-		NULL
-	);
-
-	//
-	// index.wfs is currently optional.
-	// CheckIndexFile() already accepts NULL.
-	//
-	if (IndexRaw == NULL)
-	{
-		DEBUG_PRINT(INFO, L"index.wfs was not loaded, We don't really need it anyway.");
-	}
-	else
-	{
-		DEBUG_PRINT(INFO, L"index.wfs loaded @ %p", IndexRaw);
-	}
-
-	// 7. Allocate ASSET_TABLE (WinOS-Dev Derivative again)
-	ASSET_TABLE* Table = NULL;
-
-	Status = gBS->AllocatePool(
-		EfiLoaderData,
-		sizeof(ASSET_TABLE),
-		(void**)&Table
-	);
-
-	if (EFI_ERROR(Status))
-	{
-		DEBUG_PRINT(ERROR, L"Failed to allocate %u bytes for ASSET_TABLE! %r\n",
-			sizeof(ASSET_TABLE), Status);
-
-		if (IndexRaw != NULL)
-		{
-			//
-			// IndexRaw ownership belongs to us here.
-			//
-			// The actual page count is not available because
-			// this call requested LoadedSize == NULL.
-			//
-			// We therefore leave it alone for now.
-		}
-
-		RootDir->Close(RootDir);
-
-		while (TRUE)
-			__halt();
-	}
-
-	DEBUG_PRINT(INFO, L"ASSET_TABLE allocated @ %p, %u bytes.", Table, sizeof(ASSET_TABLE));
-
-	// 8. Allocate asset entries (WinOS-Dev Derivative)
-	UINTN MaxAssetEntries = 50;
-	UINTN AssetEntriesSize =
-		sizeof(ASSET_ENTRY) * MaxAssetEntries;
-
-	Status = gBS->AllocatePool(
-		EfiLoaderData,
-		AssetEntriesSize,
-		(void**)&Table->Entries
-	);
-
-	if (EFI_ERROR(Status))
-	{
-		DEBUG_PRINT(ERROR, L"Failed to allocate asset entries! Requested size: %u bytes, Max. entries: %u, Status: %r",
-			MaxAssetEntries, AssetEntriesSize, Status);
-
-		gBS->FreePool(Table);
-		RootDir->Close(RootDir);
-
-		while (TRUE)
-			__halt();
-	}
-
-	Table->Count = 0;
-
-	DEBUG_PRINT(INFO, L"Asset entries allocated\n");
-	DEBUG_PRINT(INFO, L"    Address: %p\n", Table->Entries);
-	DEBUG_PRINT(INFO, L"    Maximum entries: %u\n", MaxAssetEntries);
-	DEBUG_PRINT(INFO, L"    Buffer size: %u bytes\n", AssetEntriesSize);
-
 	//
 	// ------------------------------------------------------------
-	// 9. Parse index
-	// ------------------------------------------------------------
-	//
-
-	DEBUG_PRINT(INFO, L"Parsing asset index...\n");
-
-	CheckIndexFile(
-		IndexRaw,
-		Table,
-		RootDir
-	);
-
-	DEBUG_PRINT(INFO, L"Asset index processing complete\n");
-	DEBUG_PRINT(INFO, L"    Asset count: %u\n", Table->Count);
-
-	//
-	// ------------------------------------------------------------
-	// 10. Build BootConfig
+	// Build BootConfig
 	// ------------------------------------------------------------
 	//
 
 	DEBUG_PRINT(INFO, L"Building BootConfig...\n");
 
-	BuildBootConfig(
-		Table,
-		GOP
-	);
+	BuildBootConfig(GOP);
 
 	DEBUG_PRINT(INFO, L"BootConfig ready\n");
 	DEBUG_PRINT(INFO, L"    Assets: %p\n", BootConfig.Assets);
@@ -1286,20 +1076,6 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	KernelStart(&BootConfig);
 
-	while (TRUE)
-		__halt();
-
-	//
-	// ------------------------------------------------------------
-	// 25. Jump to kernel
-	// ------------------------------------------------------------
-	//
-
-	KernelStart(&BootConfig);
-
-	//
-	// KernelStart should never return.
-	//
 	while (TRUE)
 		__halt();
 
