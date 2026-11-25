@@ -6,8 +6,10 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Text.Json;
+using System.Xml;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
+using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using WinOS_Editor.toolchains;
 using WinOS_Editor.Analysis;
 using WinOS_Editor.Build;
@@ -32,6 +34,45 @@ namespace WinOS_Editor
             new(StringComparer.OrdinalIgnoreCase);
 
         private double _editorFontSize = 14;
+
+        private static readonly IHighlightingDefinition VisualStudioCppHighlighting =
+            CreateVisualStudioCppHighlighting();
+
+        private static IHighlightingDefinition CreateVisualStudioCppHighlighting()
+        {
+            const string definition = """
+                <SyntaxDefinition name="Visual Studio C++" extensions=".cpp;.cc;.cxx;.h;.hpp;.hxx" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+                    <Color name="Default" foreground="#D4D4D4" />
+                    <Color name="Keyword" foreground="#569CD6" fontWeight="bold" />
+                    <Color name="Type" foreground="#4EC9B0" />
+                    <Color name="String" foreground="#CE9178" />
+                    <Color name="Character" foreground="#D7BA7D" />
+                    <Color name="Comment" foreground="#6A9955" />
+                    <Color name="Number" foreground="#B5CEA8" />
+                    <Color name="Preprocessor" foreground="#C586C0" />
+                    <Color name="Method" foreground="#DCDCAA" />
+                    <Color name="Macro" foreground="#9B9B9B" />
+                    <RuleSet>
+                        <Span color="Comment" begin="//" />
+                        <Span color="Comment" begin="/\\*" end="\\*/" />
+                        <Span color="String" begin="&quot;" end="&quot;" />
+                        <Span color="Character" begin="&apos;" end="&apos;" />
+                        <Rule color="Preprocessor">^\\s*#\\s*[a-zA-Z_][a-zA-Z0-9_]*</Rule>
+                        <Rule color="Number">\\b(0[xX][0-9a-fA-F]+|0[bB][01]+|[0-9]+(\\.[0-9]*)?([eE][+-]?[0-9]+)?)[uUlLfF]*\\b</Rule>
+                        <Rule color="Keyword">\\b(alignas|alignof|asm|auto|bool|break|case|catch|char|char8_t|char16_t|char32_t|class|const|constexpr|consteval|constinit|continue|decltype|default|delete|do|double|else|enum|explicit|export|extern|false|float|for|friend|goto|if|inline|int|long|mutable|namespace|new|noexcept|nullptr|operator|private|protected|public|register|reinterpret_cast|return|short|signed|sizeof|static|static_assert|static_cast|struct|switch|template|this|thread_local|throw|true|try|typedef|typeid|typename|union|unsigned|using|virtual|void|volatile|wchar_t|while|override|final|concept|requires|co_await|co_return|co_yield)\\b</Rule>
+                        <Rule color="Type">\\b(size_t|int8_t|int16_t|int32_t|int64_t|uint8_t|uint16_t|uint32_t|uint64_t|string|string_view|vector|array|span|optional|unique_ptr|shared_ptr)\\b</Rule>
+                        <Rule color="Method">\\b[A-Za-z_][A-Za-z0-9_]*(?=\\s*\\()</Rule>
+                        <Rule color="Macro">\\b[A-Z_][A-Z0-9_]{2,}\\b</Rule>
+                    </RuleSet>
+                </SyntaxDefinition>
+                """;
+
+            using StringReader stringReader = new(definition);
+            using XmlReader xmlReader = XmlReader.Create(stringReader);
+            XshdSyntaxDefinition xshd = HighlightingLoader.LoadXshd(xmlReader);
+            return HighlightingLoader.Load(xshd, HighlightingManager.Instance);
+        }
+
         private static readonly string SettingsDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WinOS-Editor");
         private static readonly string SettingsPath = Path.Combine(SettingsDirectory, "settings.json");
         private string _lastSearchText = "";
@@ -403,15 +444,16 @@ namespace WinOS_Editor
                 WordWrap = true,
                 ShowLineNumbers = true,
                 Margin = new(24, 4, 4, 4),
-                Background = SystemColors.DesktopBrush,
-                Foreground = new SolidColorBrush(Color.FromRgb(255, 255, 255)),
+                Background = new SolidColorBrush(Color.FromRgb(30, 30, 30)),
+                Foreground = new SolidColorBrush(Color.FromRgb(212, 212, 212)),
+                LineNumbersForeground = new SolidColorBrush(Color.FromRgb(133, 133, 133)),
                 BorderBrush = SystemColors.AccentColorDark2Brush,
                 Cursor = Cursors.IBeam,
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
                 HorizontalScrollBarVisibility = ScrollBarVisibility.Auto
             };
 
-            editor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C++");
+            editor.SyntaxHighlighting = VisualStudioCppHighlighting;
             editor.PreviewMouseWheel += (_, e) =>
             {
                 if ((Keyboard.Modifiers & ModifierKeys.Control) == 0)
