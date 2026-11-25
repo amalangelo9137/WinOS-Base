@@ -5,6 +5,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Text.Json;
+using ICSharpCode.AvalonEdit;
+using ICSharpCode.AvalonEdit.Highlighting;
 using WinOS_Editor.toolchains;
 using WinOS_Editor.Analysis;
 using WinOS_Editor.Build;
@@ -29,11 +32,14 @@ namespace WinOS_Editor
             new(StringComparer.OrdinalIgnoreCase);
 
         private double _editorFontSize = 14;
+        private static readonly string SettingsDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WinOS-Editor");
+        private static readonly string SettingsPath = Path.Combine(SettingsDirectory, "settings.json");
         private string _lastSearchText = "";
 
         public MainWindow()
         {
             InitializeComponent();
+            LoadEditorSettings();
 
             _toolchainManager.DetectLLVM();
 
@@ -374,36 +380,48 @@ namespace WinOS_Editor
             WorkspaceStatusText.Text = CurrentProject?.Name ?? "No project";
 
             if (EditorTabs.SelectedItem is not TabItem tab ||
-                tab.Content is not TextBox editor)
+                tab.Content is not TextEditor editor)
             {
                 CaretStatusText.Text = "";
                 return;
             }
 
-            int line = editor.GetLineIndexFromCharacterIndex(editor.CaretIndex);
-            int lineStart = editor.GetCharacterIndexFromLineIndex(line);
-            int column = editor.CaretIndex - lineStart;
+            int line = editor.Document.GetLineByOffset(editor.TextArea.Caret.Offset).LineNumber - 1;
+            int lineStart = editor.Document.GetLineByNumber(line + 1).Offset;
+            int column = editor.TextArea.Caret.Offset - lineStart;
 
             CaretStatusText.Text = $"Ln {line + 1}, Col {column + 1}";
         }
 
         private void CreateEditorTab(Document document)
         {
-            TextBox editor = new()
+            TextEditor editor = new()
             {
                 Name = "Code",
                 Text = document.Content,
                 FontSize = _editorFontSize,
-                TextWrapping = TextWrapping.Wrap,
+                WordWrap = true,
+                ShowLineNumbers = true,
                 Margin = new(24, 4, 4, 4),
                 Background = SystemColors.DesktopBrush,
                 Foreground = new SolidColorBrush(Color.FromRgb(255, 255, 255)),
                 BorderBrush = SystemColors.AccentColorDark2Brush,
                 Cursor = Cursors.IBeam,
-                AcceptsReturn = true,
                 AcceptsTab = false,
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
                 HorizontalScrollBarVisibility = ScrollBarVisibility.Auto
+            };
+
+            editor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C++");
+            editor.PreviewMouseWheel += (_, e) =>
+            {
+                if ((Keyboard.Modifiers & ModifierKeys.Control) == 0)
+                    return;
+
+                _editorFontSize = Math.Clamp(_editorFontSize + (e.Delta > 0 ? 1 : -1), 8, 32);
+                ApplyEditorZoom();
+                SaveEditorSettings();
+                e.Handled = true;
             };
 
             TextBlock title = new()
@@ -450,7 +468,7 @@ namespace WinOS_Editor
                 UpdateEditorStatus();
             };
 
-            editor.SelectionChanged += (_, _) => UpdateEditorStatus();
+            editor.TextArea.SelectionChanged += (_, _) => UpdateEditorStatus();
 
             // Pair brackets and quotes, wrapping any selected text.
             editor.PreviewTextInput += (_, e) =>
@@ -475,7 +493,7 @@ namespace WinOS_Editor
                     string selected = editor.SelectedText;
 
                     editor.SelectedText = typed + selected + closing;
-                    editor.CaretIndex = selectionStart + 1 + selected.Length;
+                    editor.TextArea.Caret.Offset = selectionStart + 1 + selected.Length;
                     e.Handled = true;
                     return;
                 }
@@ -483,10 +501,10 @@ namespace WinOS_Editor
                 // Move over an existing closing character instead of duplicating it.
                 if (typed is ')' or ']' or '}' or '"' or '\'')
                 {
-                    int caret = editor.CaretIndex;
+                    int caret = editor.TextArea.Caret.Offset;
                     if (caret < editor.Text.Length && editor.Text[caret] == typed)
                     {
-                        editor.CaretIndex++;
+                        editor.TextArea.Caret.Offset++;
                         e.Handled = true;
                     }
                 }
@@ -519,7 +537,7 @@ namespace WinOS_Editor
                             newline + indentation + indentUnit +
                             newline + indentation;
 
-                        editor.CaretIndex =
+                        editor.TextArea.Caret.Offset =
                             caret + newline.Length +
                             indentation.Length + indentUnit.Length;
 
@@ -533,7 +551,7 @@ namespace WinOS_Editor
 
                     string lineBreak = Environment.NewLine;
                     editor.SelectedText = lineBreak + nextIndentation;
-                    editor.CaretIndex = caret + lineBreak.Length + nextIndentation.Length;
+                    editor.TextArea.Caret.Offset = caret + lineBreak.Length + nextIndentation.Length;
                     e.Handled = true;
                     return;
                 }
@@ -542,9 +560,9 @@ namespace WinOS_Editor
                 {
                     if ((Keyboard.Modifiers & ModifierKeys.Shift) != 0)
                     {
-                        int caret = editor.CaretIndex;
-                        int line = editor.GetLineIndexFromCharacterIndex(caret);
-                        int lineStart = editor.GetCharacterIndexFromLineIndex(line);
+                        int caret = editor.TextArea.Caret.Offset;
+                        int line = editor.Document.GetLineByOffset(caret).LineNumber - 1;
+                        int lineStart = editor.Document.GetLineByNumber(line + 1).Offset;
                         int removeCount = 0;
 
                         while (removeCount < 4 &&
@@ -565,7 +583,7 @@ namespace WinOS_Editor
                         {
                             editor.Select(lineStart, removeCount);
                             editor.SelectedText = "";
-                            editor.CaretIndex = Math.Max(lineStart, caret - removeCount);
+                            editor.TextArea.Caret.Offset = Math.Max(lineStart, caret - removeCount);
                         }
                     }
                     else
@@ -580,7 +598,7 @@ namespace WinOS_Editor
                 if (e.Key != Key.Back || editor.SelectionLength != 0)
                     return;
 
-                int backspaceCaret = editor.CaretIndex;
+                int backspaceCaret = editor.TextArea.Caret.Offset;
                 if (backspaceCaret <= 0 || backspaceCaret >= editor.Text.Length)
                     return;
 
@@ -1191,7 +1209,7 @@ namespace WinOS_Editor
             }
         }
 
-        private TextBox? ActiveEditor =>
+        private TextEditor? ActiveEditor =>
             EditorTabs.SelectedItem is TabItem tab ? tab.Content as TextBox : null;
 
         private string? PromptForText(string title, string prompt, string initialValue = "")
@@ -1232,7 +1250,7 @@ namespace WinOS_Editor
 
         private void FindNext(string query)
         {
-            TextBox? editor = ActiveEditor;
+            TextEditor? editor = ActiveEditor;
             if (editor == null || string.IsNullOrEmpty(query)) return;
             int start = Math.Min(editor.SelectionStart + editor.SelectionLength, editor.Text.Length);
             int index = editor.Text.IndexOf(query, start, StringComparison.OrdinalIgnoreCase);
@@ -1245,7 +1263,7 @@ namespace WinOS_Editor
             }
             editor.Focus();
             editor.Select(index, query.Length);
-            editor.ScrollToLine(editor.GetLineIndexFromCharacterIndex(index));
+            editor.ScrollToLine(editor.Document.GetLineByOffset(index).LineNumber);
         }
 
         private void ShowReplaceDialog(object sender, RoutedEventArgs e)
@@ -1267,34 +1285,74 @@ namespace WinOS_Editor
             if (editor == null) return;
             string? value = PromptForText("Go To Line", "Line number:");
             if (!int.TryParse(value, out int requestedLine) || requestedLine < 1) return;
-            int line = Math.Clamp(requestedLine - 1, 0, editor.LineCount - 1);
+            int line = Math.Clamp(requestedLine - 1, 0, editor.Document.LineCount - 1);
             editor.Focus();
-            editor.CaretIndex = editor.GetCharacterIndexFromLineIndex(line);
-            editor.ScrollToLine(line);
+            editor.TextArea.Caret.Offset = editor.Document.GetLineByNumber(line + 1).Offset;
+            editor.ScrollToLine(line + 1);
+        }
+
+
+        private void LoadEditorSettings()
+        {
+            try
+            {
+                if (!File.Exists(SettingsPath))
+                    return;
+
+                using JsonDocument settings = JsonDocument.Parse(File.ReadAllText(SettingsPath));
+                if (settings.RootElement.TryGetProperty("editorFontSize", out JsonElement value) &&
+                    value.TryGetDouble(out double fontSize))
+                {
+                    _editorFontSize = Math.Clamp(fontSize, 8, 32);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Could not load editor settings: {ex.Message}");
+                _editorFontSize = 14;
+            }
+        }
+
+        private void SaveEditorSettings()
+        {
+            try
+            {
+                Directory.CreateDirectory(SettingsDirectory);
+                string json = JsonSerializer.Serialize(new { editorFontSize = _editorFontSize },
+                    new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(SettingsPath, json);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Could not save editor settings: {ex.Message}");
+            }
         }
 
         private void ZoomIn(object sender, RoutedEventArgs e)
         {
             _editorFontSize = Math.Min(32, _editorFontSize + 1);
             ApplyEditorZoom();
+            SaveEditorSettings();
         }
 
         private void ZoomOut(object sender, RoutedEventArgs e)
         {
             _editorFontSize = Math.Max(8, _editorFontSize - 1);
             ApplyEditorZoom();
+            SaveEditorSettings();
         }
 
         private void ResetZoom(object sender, RoutedEventArgs e)
         {
             _editorFontSize = 14;
             ApplyEditorZoom();
+            SaveEditorSettings();
         }
 
         private void ApplyEditorZoom()
         {
             foreach (TabItem tab in EditorTabs.Items)
-                if (tab.Content is TextBox editor) editor.FontSize = _editorFontSize;
+                if (tab.Content is TextEditor editor) editor.FontSize = _editorFontSize;
         }
 
         private async void CheckForErrorsClick(object sender, RoutedEventArgs e)
@@ -1484,8 +1542,8 @@ namespace WinOS_Editor
             offset += column;
 
             editor.Focus();
-            editor.CaretIndex = Math.Min(offset, editor.Text.Length);
-            editor.ScrollToLine(line);
+            editor.TextArea.Caret.Offset = Math.Min(offset, editor.Text.Length);
+            editor.ScrollToLine(line + 1);
         }
     }
 }
