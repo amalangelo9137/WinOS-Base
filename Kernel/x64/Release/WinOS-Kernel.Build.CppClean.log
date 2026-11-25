@@ -5,9 +5,9 @@ c:\users\ajxs\documents\visualuefi\winos\kernel\x64\release\graphics.obj
 c:\users\ajxs\documents\visualuefi\winos\kernel\x64\release\mathfunctions.obj
 c:\users\ajxs\documents\visualuefi\winos\kernel\x64\release\idt.obj
 c:\users\ajxs\documents\visualuefi\winos\kernel\x64\release\gdt.obj
+c:\users\ajxs\documents\visualuefi\winos\kernel\x64\release\memory.obj
 c:\users\ajxs\documents\visualuefi\winos\kernel\x64\release\math.obj
 c:\users\ajxs\documents\visualuefi\winos\kernel\x64\release\bits.obj
-c:\users\ajxs\documents\visualuefi\winos\kernel\x64\release\memory.obj
 c:\users\ajxs\documents\visualuefi\winos\x64\release\winos-kernel.bin
 c:\users\ajxs\documents\visualuefi\winos\x64\release\winos-kernel.pdb
 c:\users\ajxs\documents\visualuefi\winos\kernel\x64\release\gdt-assembly.obj

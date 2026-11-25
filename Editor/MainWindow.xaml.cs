@@ -461,7 +461,7 @@ namespace WinOS_Editor
             foreach (LineNumberMargin margin in
                      editor.TextArea.LeftMargins.OfType<LineNumberMargin>())
             {
-                margin.Foreground = lineNumberBrush;
+                //margin. = lineNumberBrush;
             }
             editor.PreviewMouseWheel += (_, e) =>
             {
@@ -1340,7 +1340,6 @@ namespace WinOS_Editor
             editor.TextArea.Caret.Offset = editor.Document.GetLineByNumber(line + 1).Offset;
             editor.ScrollToLine(line + 1);
         }
-
 
         private void LoadEditorSettings()
         {

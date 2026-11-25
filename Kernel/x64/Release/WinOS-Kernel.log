@@ -1,5 +1,18 @@
-﻿cl : command line  warning D9025: overriding '/sdl' with '/GS-'
+﻿  Assembling CrucialInternals\GDT-assembly.asm...
+  Assembling CrucialInternals\IDT-assembly.asm...
+cl : command line  warning D9025: overriding '/sdl' with '/GS-'
+  Bits.cpp
+  Math.cpp
+  Memory.cpp
+  GDT.cpp
+  IDT.cpp
+  MathFunctions.cpp
   Graphics.cpp
+  Drivers.cpp
+C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\CrucialInternals\MathFunctions.cpp(16,11): warning C4101: 'bits': unreferenced local variable
+  main.cpp
+C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\main.cpp(119,34): warning C4018: '<': signed/unsigned mismatch
+C:\Users\AJXS\Documents\VisualUefi\WinOS\Kernel\main.cpp(119,105): warning C4018: '<': signed/unsigned mismatch
   Bits.obj : MSIL .netmodule or module compiled with /GL found; restarting link with /LTCG; add /LTCG to the link command line to improve linker performance
 LINK : warning LNK4216: Exported entry point KernelMain
      Creating library C:\Users\AJXS\Documents\VisualUefi\WinOS\x64\Release\WinOS-Kernel.lib and object C:\Users\AJXS\Documents\VisualUefi\WinOS\x64\Release\WinOS-Kernel.exp
