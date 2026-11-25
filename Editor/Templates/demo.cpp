@@ -1,11 +1,10 @@
 ﻿// WinOS Framework
-// Starter source file
+// Freestanding C++ starter
 
-#include <iostream>
+#define WINOS_EXPORT \
+    extern "C" __attribute__((visibility("default")))
 
-int main()
+WINOS_EXPORT bool WinOS_Initialize() noexcept
 {
-    std::cout << "Hello, WinOS Framework!" << std::endl;
-
-    return 0;
+	return true;
 }

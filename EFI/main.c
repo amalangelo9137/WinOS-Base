@@ -474,14 +474,9 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	gST->ConOut->ClearScreen(gST->ConOut);
 
-	DEBUG_PRINT(INFO, L"==> WinOS UEFI Loader v1.4 Patch 1 (Debug Edition) <==\n");
+	Print(L"==> WinOS UEFI Loader v1.4.1 <==\n");
 
-	//
-	// ------------------------------------------------------------
 	// 1. Locate Graphics Output Protocol
-	// ------------------------------------------------------------
-	//
-
 	EFI_GRAPHICS_OUTPUT_PROTOCOL* GOP = NULL;
 
 	Status = gBS->LocateProtocol(
@@ -492,29 +487,18 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (EFI_ERROR(Status))
 	{
-		DEBUG_PRINT(ERROR, L"Failed to locate Graphics Output Protocol\n");
-		DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"Failed to locate Graphics Output Protocol! %r", Status);
 
 		while (TRUE)
 			__halt();
 	}
 
-	DEBUG_PRINT(INFO, L"GOP located\n");
-	DEBUG_PRINT(INFO, L"    GOP: %p\n", GOP);
-	DEBUG_PRINT(INFO, L"    FrameBuffer: %p\n",
-		(void*)GOP->Mode->FrameBufferBase);
-	DEBUG_PRINT(INFO, L"    Resolution: %u x %u\n",
-		GOP->Mode->Info->HorizontalResolution,
-		GOP->Mode->Info->VerticalResolution);
-	DEBUG_PRINT(INFO, L"    PixelsPerScanLine: %u\n",
+	DEBUG_PRINT(INFO, L"GOP located at %p, Framebuffer at %p. EFI reported resolution [%u × %u], Pixels per scan line = %u.",
+		GOP, (void*)GOP->Mode->FrameBufferBase,
+		GOP->Mode->Info->HorizontalResolution, GOP->Mode->Info->VerticalResolution,
 		GOP->Mode->Info->PixelsPerScanLine);
 
-	//
-	// ------------------------------------------------------------
 	// 2. Get Loaded Image Protocol
-	// ------------------------------------------------------------
-	//
-
 	EFI_LOADED_IMAGE_PROTOCOL* LoadedImage = NULL;
 
 	Status = gBS->HandleProtocol(
@@ -525,24 +509,17 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (EFI_ERROR(Status))
 	{
-		DEBUG_PRINT(ERROR, L"Failed to get Loaded Image Protocol\n");
-		DEBUG_PRINT(ERROR, L"    ImageHandle: %p\n", ImageHandle);
-		DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"Failed to get Loaded Image Protocol (imageHandle: %p)! %r.",
+			ImageHandle, Status);
 
 		while (TRUE)
 			__halt();
 	}
 
-	DEBUG_PRINT(INFO, L"Loaded Image Protocol located\n");
-	DEBUG_PRINT(INFO, L"    LoadedImage: %p\n", LoadedImage);
-	DEBUG_PRINT(INFO, L"    DeviceHandle: %p\n", LoadedImage->DeviceHandle);
+	DEBUG_PRINT(INFO, L"Loaded Image Protocol located. Loaded Image: %p, Device Handle: %p.",
+		LoadedImage, LoadedImage->DeviceHandle);
 
-	//
-	// ------------------------------------------------------------
 	// 3. Get Simple File System Protocol
-	// ------------------------------------------------------------
-	//
-
 	EFI_SIMPLE_FILE_SYSTEM_PROTOCOL* FileSystem = NULL;
 
 	Status = gBS->HandleProtocol(
@@ -553,23 +530,16 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (EFI_ERROR(Status))
 	{
-		DEBUG_PRINT(ERROR, L"Failed to get Simple File System Protocol\n");
-		DEBUG_PRINT(ERROR, L"    DeviceHandle: %p\n", LoadedImage->DeviceHandle);
-		DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"Failed to get Simple File System Protocol! %r",
+			Status);
 
 		while (TRUE)
 			__halt();
 	}
 
-	DEBUG_PRINT(INFO, L"Simple File System Protocol located\n");
-	DEBUG_PRINT(INFO, L"    FileSystem: %p\n", FileSystem);
+	DEBUG_PRINT(INFO, L"Simple File System Protocol located @ %p", FileSystem);
 
-	//
-	// ------------------------------------------------------------
 	// 4. Open filesystem volume
-	// ------------------------------------------------------------
-	//
-
 	EFI_FILE* RootDir = NULL;
 
 	Status = FileSystem->OpenVolume(
@@ -579,23 +549,15 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (EFI_ERROR(Status))
 	{
-		DEBUG_PRINT(ERROR, L"Failed to open filesystem volume\n");
-		DEBUG_PRINT(ERROR, L"    FileSystem: %p\n", FileSystem);
-		DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"Failed to open filesystem volume! %r", Status);
 
 		while (TRUE)
 			__halt();
 	}
 
-	DEBUG_PRINT(INFO, L"Filesystem volume opened\n");
-	DEBUG_PRINT(INFO, L"    RootDir: %p\n", RootDir);
+	DEBUG_PRINT(INFO, L"Filesystem volume opened. Root @ %p", RootDir);
 
-	//
-	// ------------------------------------------------------------
 	// 5. Reset root directory position
-	// ------------------------------------------------------------
-	//
-
 	Status = RootDir->SetPosition(
 		RootDir,
 		0
@@ -603,10 +565,7 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (EFI_ERROR(Status))
 	{
-		DEBUG_PRINT(INFO, L"Failed to reset root directory position\n");
-		DEBUG_PRINT(INFO, L"    RootDir: %p\n", RootDir);
-		DEBUG_PRINT(INFO, L"    Position: 0\n");
-		DEBUG_PRINT(INFO, L"    Status: %r\n", Status);
+		DEBUG_PRINT(INFO, L"Failed to reset root directory position! %r", Status);
 
 		RootDir->Close(RootDir);
 
@@ -614,16 +573,10 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 			__halt();
 	}
 
-	DEBUG_PRINT(INFO, L"Root directory position reset\n");
+	DEBUG_PRINT(INFO, L"Root directory position reset!\n");
 
-	//
-	// ------------------------------------------------------------
-	// 6. Load index.wfs
-	// ------------------------------------------------------------
-	//
-
-	DEBUG_PRINT(INFO, L"Loading index file\n");
-	DEBUG_PRINT(INFO, L"    Path: \\\\index.wfs\n");
+	// 6. Load index.wfs (temporary, will remove / edit later)
+	DEBUG_PRINT(INFO, L"Loading index file (WinOS-Dev Derivative) @ \\\\index.wfs...");
 
 	void* IndexRaw = LoadFileIntoRAM(
 		RootDir,
@@ -637,21 +590,14 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 	//
 	if (IndexRaw == NULL)
 	{
-		DEBUG_PRINT(WARN, L"index.wfs was not loaded\n");
-		DEBUG_PRINT(WARN, L"    Continuing without indexed assets\n");
+		DEBUG_PRINT(INFO, L"index.wfs was not loaded, We don't really need it anyway.");
 	}
 	else
 	{
-		DEBUG_PRINT(INFO, L"index.wfs loaded\n");
-		DEBUG_PRINT(INFO, L"    Address: %p\n", IndexRaw);
+		DEBUG_PRINT(INFO, L"index.wfs loaded @ %p", IndexRaw);
 	}
 
-	//
-	// ------------------------------------------------------------
-	// 7. Allocate ASSET_TABLE
-	// ------------------------------------------------------------
-	//
-
+	// 7. Allocate ASSET_TABLE (WinOS-Dev Derivative again)
 	ASSET_TABLE* Table = NULL;
 
 	Status = gBS->AllocatePool(
@@ -662,10 +608,8 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (EFI_ERROR(Status))
 	{
-		DEBUG_PRINT(ERROR, L"Failed to allocate ASSET_TABLE\n");
-		DEBUG_PRINT(ERROR, L"    Requested size: %u bytes\n",
-			sizeof(ASSET_TABLE));
-		DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"Failed to allocate %u bytes for ASSET_TABLE! %r\n",
+			sizeof(ASSET_TABLE), Status);
 
 		if (IndexRaw != NULL)
 		{
@@ -684,16 +628,9 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 			__halt();
 	}
 
-	DEBUG_PRINT(INFO, L"ASSET_TABLE allocated\n");
-	DEBUG_PRINT(INFO, L"    Address: %p\n", Table);
-	DEBUG_PRINT(INFO, L"    Size: %u bytes\n", sizeof(ASSET_TABLE));
+	DEBUG_PRINT(INFO, L"ASSET_TABLE allocated @ %p, %u bytes.", Table, sizeof(ASSET_TABLE));
 
-	//
-	// ------------------------------------------------------------
-	// 8. Allocate asset entries
-	// ------------------------------------------------------------
-	//
-
+	// 8. Allocate asset entries (WinOS-Dev Derivative)
 	UINTN MaxAssetEntries = 50;
 	UINTN AssetEntriesSize =
 		sizeof(ASSET_ENTRY) * MaxAssetEntries;
@@ -706,10 +643,8 @@ EFI_STATUS EFIAPI UefiMain(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE* Syste
 
 	if (EFI_ERROR(Status))
 	{
-		DEBUG_PRINT(ERROR, L"Failed to allocate asset entries\n");
-		DEBUG_PRINT(ERROR, L"    Maximum entries: %u\n", MaxAssetEntries);
-		DEBUG_PRINT(ERROR, L"    Requested size: %u bytes\n", AssetEntriesSize);
-		DEBUG_PRINT(ERROR, L"    Status: %r\n", Status);
+		DEBUG_PRINT(ERROR, L"Failed to allocate asset entries! Requested size: %u bytes, Max. entries: %u, Status: %r",
+			MaxAssetEntries, AssetEntriesSize, Status);
 
 		gBS->FreePool(Table);
 		RootDir->Close(RootDir);

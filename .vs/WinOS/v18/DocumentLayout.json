@@ -3,32 +3,36 @@
   "WorkspaceRootPath": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{CDFBF006-BE3F-4CF4-87CD-F0FE771FF41E}|Kernel\\WinOS-Kernel.vcxproj|C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Kernel\\Graphics\\Graphics.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{CDFBF006-BE3F-4CF4-87CD-F0FE771FF41E}|Kernel\\WinOS-Kernel.vcxproj|solutionrelative:Kernel\\Graphics\\Graphics.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CDFBF006-BE3F-4CF4-87CD-F0FE771FF41E}|Kernel\\WinOS-Kernel.vcxproj|C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\SDK\\INCLUDE\\WINOS\\GRAPHICS\\FRAMEBUFFER.H||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{CDFBF006-BE3F-4CF4-87CD-F0FE771FF41E}|Kernel\\WinOS-Kernel.vcxproj|solutionrelative:SDK\\INCLUDE\\WINOS\\GRAPHICS\\FRAMEBUFFER.H||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CDFBF006-BE3F-4CF4-87CD-F0FE771FF41E}|Kernel\\WinOS-Kernel.vcxproj|C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Kernel\\Graphics\\Graphics.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{CDFBF006-BE3F-4CF4-87CD-F0FE771FF41E}|Kernel\\WinOS-Kernel.vcxproj|solutionrelative:Kernel\\Graphics\\Graphics.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CDFBF006-BE3F-4CF4-87CD-F0FE771FF41E}|Kernel\\WinOS-Kernel.vcxproj|C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Kernel\\HIDs\\Drivers.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{CDFBF006-BE3F-4CF4-87CD-F0FE771FF41E}|Kernel\\WinOS-Kernel.vcxproj|solutionrelative:Kernel\\HIDs\\Drivers.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{72CE9C10-CD68-40D2-8B13-28ACBED8A2BB}|Editor\\WinOS-Editor.csproj|c:\\users\\ajxs\\documents\\visualuefi\\winos\\editor\\buildmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{72CE9C10-CD68-40D2-8B13-28ACBED8A2BB}|Editor\\WinOS-Editor.csproj|solutionrelative:editor\\buildmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{863F20AB-344D-48FD-9982-15EF853EBF2E}|EFI\\WinOS-EFI.vcxproj|C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\EFI\\main.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{863F20AB-344D-48FD-9982-15EF853EBF2E}|EFI\\WinOS-EFI.vcxproj|solutionrelative:EFI\\main.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{863F20AB-344D-48FD-9982-15EF853EBF2E}|EFI\\WinOS-EFI.vcxproj|C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\EFI\\Debug.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{863F20AB-344D-48FD-9982-15EF853EBF2E}|EFI\\WinOS-EFI.vcxproj|solutionrelative:EFI\\Debug.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{CDFBF006-BE3F-4CF4-87CD-F0FE771FF41E}|Kernel\\WinOS-Kernel.vcxproj|C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Kernel\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{CDFBF006-BE3F-4CF4-87CD-F0FE771FF41E}|Kernel\\WinOS-Kernel.vcxproj|solutionrelative:Kernel\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{863F20AB-344D-48FD-9982-15EF853EBF2E}|EFI\\WinOS-EFI.vcxproj|C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\EFI\\Debug.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{863F20AB-344D-48FD-9982-15EF853EBF2E}|EFI\\WinOS-EFI.vcxproj|solutionrelative:EFI\\Debug.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{72CE9C10-CD68-40D2-8B13-28ACBED8A2BB}|Editor\\WinOS-Editor.csproj|c:\\users\\ajxs\\documents\\visualuefi\\winos\\editor\\templates\\demo.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{72CE9C10-CD68-40D2-8B13-28ACBED8A2BB}|Editor\\WinOS-Editor.csproj|solutionrelative:editor\\templates\\demo.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{863F20AB-344D-48FD-9982-15EF853EBF2E}|EFI\\WinOS-EFI.vcxproj|C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\SHARED.H||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{863F20AB-344D-48FD-9982-15EF853EBF2E}|EFI\\WinOS-EFI.vcxproj|solutionrelative:SHARED.H||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{72CE9C10-CD68-40D2-8B13-28ACBED8A2BB}|Editor\\WinOS-Editor.csproj|c:\\users\\ajxs\\documents\\visualuefi\\winos\\editor\\toolchainconfig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{72CE9C10-CD68-40D2-8B13-28ACBED8A2BB}|Editor\\WinOS-Editor.csproj|solutionrelative:editor\\toolchainconfig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{72CE9C10-CD68-40D2-8B13-28ACBED8A2BB}|Editor\\WinOS-Editor.csproj|c:\\users\\ajxs\\documents\\visualuefi\\winos\\editor\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{72CE9C10-CD68-40D2-8B13-28ACBED8A2BB}|Editor\\WinOS-Editor.csproj|solutionrelative:editor\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -38,97 +42,107 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 1,
               "Title": "main.c",
               "DocumentMoniker": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\EFI\\main.c",
               "RelativeDocumentMoniker": "EFI\\main.c",
               "ToolTip": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\EFI\\main.c",
               "RelativeToolTip": "EFI\\main.c",
-              "ViewState": "AgIAALoBAAAAAAAAAAAAAKABAAAUAAAAAAAAAA==",
+              "ViewState": "AgIAAFACAAAASFS3agYNwOICAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
               "WhenOpened": "2026-11-21T06:55:46.319Z",
-              "IsPinned": true
+              "IsPinned": true,
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 3,
               "Title": "main.cpp",
               "DocumentMoniker": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Kernel\\main.cpp",
               "RelativeDocumentMoniker": "Kernel\\main.cpp",
               "ToolTip": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Kernel\\main.cpp",
               "RelativeToolTip": "Kernel\\main.cpp",
-              "ViewState": "AgIAAGkAAABgZmZmZmYkwHYAAACPAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHYAAACPAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2026-11-20T17:44:56.268Z",
               "IsPinned": true
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Drivers.cpp",
-              "DocumentMoniker": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Kernel\\HIDs\\Drivers.cpp",
-              "RelativeDocumentMoniker": "Kernel\\HIDs\\Drivers.cpp",
-              "ToolTip": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Kernel\\HIDs\\Drivers.cpp",
-              "RelativeToolTip": "Kernel\\HIDs\\Drivers.cpp",
-              "ViewState": "AgIAAIIAAAAAAAAAAAAMwJIAAAB+AAAAAAAAAA==",
+              "DocumentIndex": 4,
+              "Title": "demo.cpp",
+              "DocumentMoniker": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Editor\\Templates\\demo.cpp",
+              "RelativeDocumentMoniker": "Editor\\Templates\\demo.cpp",
+              "ToolTip": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Editor\\Templates\\demo.cpp",
+              "RelativeToolTip": "Editor\\Templates\\demo.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAASAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2026-11-21T14:32:14.8Z",
+              "WhenOpened": "2026-11-21T16:36:38.758Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Editor\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "Editor\\MainWindow.xaml.cs",
+              "ToolTip": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Editor\\MainWindow.xaml.cs",
+              "RelativeToolTip": "Editor\\MainWindow.xaml.cs",
+              "ViewState": "AgIAADMFAAAANDMzMzMLwGYFAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-21T16:34:51.051Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "BuildManager.cs",
+              "DocumentMoniker": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Editor\\BuildManager.cs",
+              "RelativeDocumentMoniker": "Editor\\BuildManager.cs",
+              "ToolTip": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Editor\\BuildManager.cs*",
+              "RelativeToolTip": "Editor\\BuildManager.cs*",
+              "ViewState": "AgIAAIEAAACAZmZmZmYkwJkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-21T16:34:13.226Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 6,
+              "Title": "ToolchainConfig.cs",
+              "DocumentMoniker": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Editor\\ToolchainConfig.cs",
+              "RelativeDocumentMoniker": "Editor\\ToolchainConfig.cs",
+              "ToolTip": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Editor\\ToolchainConfig.cs",
+              "RelativeToolTip": "Editor\\ToolchainConfig.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAAAawCIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-21T16:33:45.419Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Shared.h",
+              "DocumentMoniker": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Shared.h",
+              "RelativeDocumentMoniker": "Shared.h",
+              "ToolTip": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Shared.h",
+              "RelativeToolTip": "Shared.h",
+              "ViewState": "AgIAAE8AAAAAAAAAAAAAAGoAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-11-21T16:11:45.503Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "Debug.h",
               "DocumentMoniker": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\EFI\\Debug.h",
               "RelativeDocumentMoniker": "EFI\\Debug.h",
               "ToolTip": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\EFI\\Debug.h",
               "RelativeToolTip": "EFI\\Debug.h",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAtAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAATAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2026-11-21T12:08:47.128Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Graphics.h",
-              "DocumentMoniker": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Kernel\\Graphics\\Graphics.h",
-              "RelativeDocumentMoniker": "Kernel\\Graphics\\Graphics.h",
-              "ToolTip": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Kernel\\Graphics\\Graphics.h",
-              "RelativeToolTip": "Kernel\\Graphics\\Graphics.h",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAuAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-11-21T06:28:23.669Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Graphics.cpp",
-              "DocumentMoniker": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Kernel\\Graphics\\Graphics.cpp",
-              "RelativeDocumentMoniker": "Kernel\\Graphics\\Graphics.cpp",
-              "ToolTip": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\Kernel\\Graphics\\Graphics.cpp",
-              "RelativeToolTip": "Kernel\\Graphics\\Graphics.cpp",
-              "ViewState": "AgIAAIAAAAAAAAAAAAAAAIgAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2026-11-20T17:45:05.904Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Framebuffer.h",
-              "DocumentMoniker": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\SDK\\Include\\WinOS\\Graphics\\Framebuffer.h",
-              "RelativeDocumentMoniker": "SDK\\Include\\WinOS\\Graphics\\Framebuffer.h",
-              "ToolTip": "C:\\Users\\AJXS\\Documents\\VisualUefi\\WinOS\\SDK\\Include\\WinOS\\Graphics\\Framebuffer.h",
-              "RelativeToolTip": "SDK\\Include\\WinOS\\Graphics\\Framebuffer.h",
-              "ViewState": "AgIAABoAAAAAAAAAAAAAACMAAAA0AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-11-15T15:24:05.378Z",
-              "EditorCaption": ""
             }
           ]
         }

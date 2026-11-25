@@ -78,3 +78,30 @@ typedef struct {
 	uint64_t  MemMapSize;
 	uint64_t  MemMapDescriptorSize;
 } BOOT_CONFIG;
+
+// ============================================================
+// WinOS Dynamic Framework Library (.wdll)
+// ============================================================
+
+#define WDLL_MAGIC "WDLL"
+#define WDLL_FORMAT_VERSION 1
+
+typedef enum {
+	WDLL_ARCH_UNKNOWN = 0,
+	WDLL_ARCH_X86_64 = 1
+} WDLL_ARCHITECTURE;
+
+typedef struct {
+	uint8_t Magic[4];              // "WDLL"
+	uint16_t FormatVersion;        // WDLL_FORMAT_VERSION
+	uint16_t HeaderSize;
+
+	uint32_t Architecture;         // WDLL_ARCHITECTURE
+	uint32_t Flags;
+
+	uint64_t ManifestOffset;
+	uint64_t ManifestSize;
+
+	uint64_t PayloadOffset;
+	uint64_t PayloadSize;
+} WDLL_HEADER;

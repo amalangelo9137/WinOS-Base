@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using WinOS_Editor.toolchains;
 using WinOS_Editor.Analysis;
+using WinOS_Editor.Build;
 
 namespace WinOS_Editor
 {
@@ -1339,88 +1340,46 @@ namespace WinOS_Editor
 
         private async void BuildProjectClick(object sender, RoutedEventArgs e)
         {
-            if (CurrentProject == null || string.IsNullOrEmpty(CurrentProjectPath))
+            if (CurrentProject == null ||
+                string.IsNullOrEmpty(CurrentProjectPath))
             {
                 MessageBox.Show("Open a framework project first.");
                 return;
             }
-            if (!_toolchainManager.IsAvailable)
+
+            if (!_toolchainManager.IsAvailable ||
+                string.IsNullOrEmpty(_toolchainManager.LLVMPath))
             {
-                MessageBox.Show("LLVM/Clang was not found. Install LLVM and ensure clang++.exe is on PATH.");
+                MessageBox.Show(
+                    "LLVM/Clang was not found. Install LLVM and ensure clang++.exe is available.");
                 return;
             }
 
-            string projectDirectory = Path.GetDirectoryName(CurrentProjectPath)!;
-            string outputDirectory = Path.Combine(projectDirectory, "Build", "obj");
-            Directory.CreateDirectory(outputDirectory);
             BuildOutput.Clear();
-            BuildOutput.AppendText("Compiling source files to object files...\n");
-            int compiled = 0;
-            int failures = 0;
 
-            foreach (string relative in CurrentProject.SourceFiles)
+            string projectDirectory =
+                Path.GetDirectoryName(CurrentProjectPath)!;
+
+            var buildManager = new BuildManager(
+                _toolchainManager.LLVMPath);
+
+            try
             {
-                string extension = Path.GetExtension(relative).ToLowerInvariant();
-                if (extension is not (".cpp" or ".cc" or ".cxx" or ".c")) continue;
-                string source = Path.GetFullPath(Path.Combine(projectDirectory, relative));
-                if (!File.Exists(source))
-                {
-                    failures++;
-                    BuildOutput.AppendText("[MISSING] " + source + "\n");
-                    continue;
-                }
+                bool success = await buildManager.BuildAsync(
+                    CurrentProject,
+                    projectDirectory,
+                    message => BuildOutput.AppendText(message + Environment.NewLine));
 
-                string relativeObjectName = Path.ChangeExtension(
-                    Path.GetRelativePath(projectDirectory, source), ".obj");
-                foreach (char invalid in Path.GetInvalidFileNameChars())
-                    relativeObjectName = relativeObjectName.Replace(invalid, '_');
-                relativeObjectName = relativeObjectName
-                    .Replace(Path.DirectorySeparatorChar, '_')
-                    .Replace(Path.AltDirectorySeparatorChar, '_');
-                string objectPath = Path.Combine(outputDirectory, relativeObjectName);
-                ProcessStartInfo start = new()
-                {
-                    FileName = Path.Combine(_toolchainManager.LLVMPath!, "clang++.exe"),
-                    WorkingDirectory = projectDirectory,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true
-                };
-                start.ArgumentList.Add("-c");
-                start.ArgumentList.Add(source);
-                start.ArgumentList.Add("-o");
-                start.ArgumentList.Add(objectPath);
-
-                try
-                {
-                    using Process process = new() { StartInfo = start };
-                    process.Start();
-                    Task<string> stdout = process.StandardOutput.ReadToEndAsync();
-                    Task<string> stderr = process.StandardError.ReadToEndAsync();
-                    await process.WaitForExitAsync();
-                    string messages = (await stderr + Environment.NewLine + await stdout).Trim();
-                    if (!string.IsNullOrWhiteSpace(messages)) BuildOutput.AppendText(messages + Environment.NewLine);
-                    if (process.ExitCode == 0)
-                    {
-                        compiled++;
-                        BuildOutput.AppendText("[OK] " + relative + " -> " + objectPath + "\n");
-                    }
-                    else
-                    {
-                        failures++;
-                        BuildOutput.AppendText("[FAILED] " + relative + "\n");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    failures++;
-                    BuildOutput.AppendText("[FAILED] " + relative + ": " + ex.Message + "\n");
-                }
+                BuildOutput.AppendText(
+                    success
+                        ? Environment.NewLine + "Build completed successfully."
+                        : Environment.NewLine + "Build failed.");
             }
-
-            BuildOutput.AppendText("\nCompile stage finished. Successful: " + compiled + "; Failed: " + failures + ".");
-            BuildOutput.AppendText("\nThis stage creates .obj files only; linking and .wdll packaging remain future build-system work.");
+            catch (Exception ex)
+            {
+                BuildOutput.AppendText(
+                    Environment.NewLine + "[BUILD ERROR] " + ex.Message);
+            }
         }
 
         private async Task TestClangAsync()
