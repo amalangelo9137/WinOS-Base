@@ -11,6 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="demo.cpp" />
     <None Remove="Templates\demo.cpp" />
   </ItemGroup>
