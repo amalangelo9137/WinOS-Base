@@ -407,7 +407,6 @@ namespace WinOS_Editor
                 Foreground = new SolidColorBrush(Color.FromRgb(255, 255, 255)),
                 BorderBrush = SystemColors.AccentColorDark2Brush,
                 Cursor = Cursors.IBeam,
-                AcceptsTab = false,
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
                 HorizontalScrollBarVisibility = ScrollBarVisibility.Auto
             };
@@ -1210,7 +1209,7 @@ namespace WinOS_Editor
         }
 
         private TextEditor? ActiveEditor =>
-            EditorTabs.SelectedItem is TabItem tab ? tab.Content as TextBox : null;
+            EditorTabs.SelectedItem is TabItem tab ? tab.Content as TextEditor : null;
 
         private string? PromptForText(string title, string prompt, string initialValue = "")
         {
