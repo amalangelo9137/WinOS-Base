@@ -1268,7 +1268,7 @@ namespace WinOS_Editor
 
         private void ShowReplaceDialog(object sender, RoutedEventArgs e)
         {
-            TextBox? editor = ActiveEditor;
+            TextEditor? editor = ActiveEditor;
             if (editor == null) return;
             string? find = PromptForText("Replace", "Find:", _lastSearchText);
             if (string.IsNullOrEmpty(find)) return;
@@ -1281,7 +1281,7 @@ namespace WinOS_Editor
 
         private void ShowGoToLineDialog(object sender, RoutedEventArgs e)
         {
-            TextBox? editor = ActiveEditor;
+            TextEditor? editor = ActiveEditor;
             if (editor == null) return;
             string? value = PromptForText("Go To Line", "Line number:");
             if (!int.TryParse(value, out int requestedLine) || requestedLine < 1) return;
@@ -1526,7 +1526,7 @@ namespace WinOS_Editor
 
             // Find the editor belonging to the opened document.
             if (EditorTabs.SelectedItem is not TabItem tab ||
-                tab.Content is not TextBox editor)
+                tab.Content is not TextEditor editor)
                 return;
 
             string[] lines = editor.Text.Split('\n');
